@@ -2,9 +2,9 @@
 <html>
 <head>
     <meta charset="UTF-8"/>
-    <title>{% block title %}Welcome!{% endblock %}</title>
-    {% block stylesheets %}{% endblock %}
+    <title>Welcome!</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
+    {% block javascripts %}{% endblock %}
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -20,17 +20,24 @@
         }
     </style>
 </head>
-<body>
+<body onload="load()">
 <header>
 
     <nav>
         <div class="nav-wrapper light-blue">
             <a class="brand-logo center">Karma</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="register.html" class="waves-effect waves-light btn">Register <i
-                                class="material-icons right">account_box</i></a></li>
-                <li><a href="login.html" class="waves-effect waves-light btn">Login <i class="material-icons right">account_circle</i></a>
-                </li>
+                <div>
+                    {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                        <li>{{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }}</li>
+                        <li><a href="{{ path('fos_user_security_logout') }}" class="waves-effect waves-light btn">
+                                {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">exit_to_app</i>
+                            </a></li>
+                    {% else %}
+                        <a href="{{ path('fos_user_security_login') }}" class="waves-effect waves-light btn">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">account_circle</i></a>
+                        <a href="{{ path('fos_user_registration_register') }}" class="waves-effect waves-light btn">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">account_box</i></a>
+                    {% endif %}
+                </div>
             </ul>
         </div>
     </nav>
@@ -40,26 +47,10 @@
 {% block main %}{% endblock %}
 
 <footer class="page-footer light-blue">
-    <div class="container">
-        <div class="row">
-            <div class="col l6 s12">
-                <h5 class="white-text">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
-                    content.</p>
-            </div>
-            <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Links</h5>
-                <ul>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
     <div class="footer-copyright">
         <div class="container">
-            © 2014 Copyright Text
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            © 2018 Copyright To : MEZIANE Yanis, CHAMAYOU Guilhem, PICARD Dorian
+            <a class="grey-text text-lighten-4 right" href="https://github.com/mistermania/Karma">GitHub</a>
         </div>
     </div>
 </footer>

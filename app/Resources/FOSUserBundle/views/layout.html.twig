@@ -2,18 +2,47 @@
 <html>
     <head>
         <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
+        <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            body {
+                display: flex;
+                min-height: 100vh;
+                flex-direction: column;
+            }
+
+            main {
+                flex: 1 0 auto;
+            }
+        </style>
     </head>
     <body>
-        <div>
-            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
-                {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
-                <a href="{{ path('fos_user_security_logout') }}">
-                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
-                </a>
-            {% else %}
-                <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
-            {% endif %}
-        </div>
+    <header>
+
+        <nav>
+            <div class="nav-wrapper light-blue">
+                <a class="brand-logo center">Karma</a>
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <div>
+                        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                            <li>{{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }}</li>
+                            <li><a href="{{ path('fos_user_security_logout') }}" class="waves-effect waves-light btn">
+                                {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">exit_to_app</i>
+                            </a></li>
+                        {% else %}
+                            <a href="{{ path('fos_user_security_login') }}" class="waves-effect waves-light btn">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">account_circle</i></a>
+                            <a href="{{ path('fos_user_registration_register') }}" class="waves-effect waves-light btn">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">account_box</i></a>
+                        {% endif %}
+                    </div>
+                </ul>
+            </div>
+        </nav>
+
+    </header>
+    <main>
 
         {% if app.request.hasPreviousSession %}
             {% for type, messages in app.session.flashbag.all() %}
@@ -29,5 +58,15 @@
             {% block fos_user_content %}
             {% endblock fos_user_content %}
         </div>
+    </main>
+
+    <footer class="page-footer light-blue">
+        <div class="footer-copyright">
+            <div class="container">
+                © 2018 Copyright To : MEZIANE Yanis, CHAMAYOU Guilhem, PICARD Dorian
+                <a class="grey-text text-lighten-4 right" href="https://github.com/mistermania/Karma">GitHub</a>
+            </div>
+        </div>
+    </footer>
     </body>
 </html>

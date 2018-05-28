@@ -25,22 +25,27 @@ class BoardService
         for ($i = 0; $i < 4; $i++) {
             for ($j = 2; $j < 15; $j++) {
                 $color = "";
+                $image = "";
                 switch ($i) {
                     case 0:
+                        $image = $j."C.png";
                         $color = "trefle";
                         break;
                     case 1:
+                        $image = $j."S.png";
                         $color = "pique";
                         break;
                     case 2:
+                        $image = $j."D.png";
                         $color = "carreau";
                         break;
                     case 3:
+                        $image = $j."H.png";
                         $color = "coeur";
                         break;
                 }
 
-                $board[] = new CarteModel($index, $j, $color, "pickaxe", 0);
+                $board[] = new CarteModel($index, $j, $color, "pickaxe", 0,$image);
                 $index = $index + 1;
             }
         }

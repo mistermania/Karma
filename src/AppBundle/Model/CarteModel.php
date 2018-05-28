@@ -16,15 +16,52 @@ class CarteModel
     private $_color;
     private $_state;
     private $_player;
+    private $_image;
 
-    function __construct($id,$number,$color,$state,$player)
+
+    function __construct($id,$number,$color,$state,$player,$image)
     {
         $this->_id = $id;
         $this->_number = $number;
         $this->_color = $color;
         $this->_state = $state;
         $this->_player = $player;
+        $this->_image = $image;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->_id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getImage()
+    {
+        return $this->_image;
+    }
+
+    /**
+     * @param mixed $image
+     */
+    public function setImage($image)
+    {
+        $this->_image = $image;
+    }
+
+
 
     /**
      * @return mixed

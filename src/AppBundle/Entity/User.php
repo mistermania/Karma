@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as FosUser;
 
@@ -21,6 +22,13 @@ class User extends FosUser
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="Game", mappedBy="players")
+     */
+    protected $games;
 
 
     /**

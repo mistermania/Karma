@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\AppBundle;
 use AppBundle\Entity\Game;
+use AppBundle\Model\CarteModel;
 use AppBundle\Service\BoardService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -24,7 +25,7 @@ class GameController extends Controller
     {
 
         $em = $this->getDoctrine()->getManager();
-        $game = $em->getRepository('AppBundle:Game')->find(1);
+        $game = $em->getRepository('AppBundle:Game')->find(23);
         $data = $game->getBoard();
 
         $serializer = new Serializer(
@@ -32,12 +33,14 @@ class GameController extends Controller
             array(new XmlEncoder(), new JsonEncoder())
         );
 
-        $current_board = $serializer->deserialize($data, Game::class, 'xml');
+        $current_board = $serializer->deserialize($data, CarteModel::class . '[]' , 'json');
+        dump($current_board);
 
 
         return $this->render('Game/get_board.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
-            'data' => $data
+            'data' => $data,
+            'current_board' => $current_board
         ]);
     }
 
@@ -67,7 +70,7 @@ class GameController extends Controller
 
         $serializer = new Serializer($normalizers,$encoders);
 
-        $data = $serializer->serialize($current_board,'xml');
+        $data = $serializer->serialize($current_board,'json');
 
         $game = new Game();
         $game->setBoard($data);

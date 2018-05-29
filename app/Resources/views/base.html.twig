@@ -1,13 +1,63 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
-    </body>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Welcome!</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
+    {% block javascripts %}{% endblock %}
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+    </style>
+</head>
+<body onload="load()">
+<header>
+
+    <nav>
+        <div class="nav-wrapper light-blue">
+            <a class="brand-logo center"><b>&nbspKARMA&nbsp</b><i class="material-icons" style="transform: scale(2,2);">flare</i><i class="material-icons right" style="transform: scale(2,2);">flare</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <div>
+                    {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                        <li>{{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }}</li>
+                        <li><a href="{{ path('fos_user_security_logout') }}" class="waves-effect waves-light btn">
+                                {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">exit_to_app</i>
+                            </a></li>
+                    {% else %}
+                        <a href="{{ path('fos_user_security_login') }}" class="waves-effect waves-light btn">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">account_circle</i></a>
+                        <a href="{{ path('fos_user_registration_register') }}" class="waves-effect waves-light btn">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}<i class="material-icons right">account_box</i></a>
+                    {% endif %}
+                </div>
+            </ul>
+        </div>
+    </nav>
+
+</header>
+
+{% block main %}{% endblock %}
+
+<footer class="page-footer light-blue">
+    <div class="footer-copyright">
+        <div class="container">
+            © 2018 Copyright To : MEZIANE Yanis, CHAMAYOU Guilhem, PICARD Dorian
+            <a class="grey-text text-lighten-4 right" href="https://github.com/mistermania/Karma">GitHub</a>
+        </div>
+    </div>
+</footer>
+
+<!--JavaScript at end of body for optimized loading-->
+<!-- Compiled and minified JavaScript -->
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+</body>
 </html>

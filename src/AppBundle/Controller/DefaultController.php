@@ -48,9 +48,12 @@ class DefaultController extends Controller
         $serializer = new Serializer($normalizers,$encoders);
         dump($serializer->serialize($board,'json'));
 
+
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
         ]);
+
+
     }
 
     /**

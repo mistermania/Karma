@@ -2,8 +2,18 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\AppBundle;
+use AppBundle\Entity\Game;
+use AppBundle\Service\BoardService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\ExpressionLanguage\Tests\Node\Obj;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class GameController extends Controller
 {
@@ -12,9 +22,23 @@ class GameController extends Controller
      */
     public function getBoardAction()
     {
-        return $this->render('AppBundle:Game:get_board.html.twig', array(
-            // ...
-        ));
+
+        $em = $this->getDoctrine()->getManager();
+        $game = $em->getRepository('AppBundle:Game')->find(1);
+        $data = $game->getBoard();
+
+        $serializer = new Serializer(
+            array(new GetSetMethodNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()),
+            array(new XmlEncoder(), new JsonEncoder())
+        );
+
+        $current_board = $serializer->deserialize($data, Game::class, 'xml');
+
+
+        return $this->render('Game/get_board.html.twig', [
+            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'data' => $data
+        ]);
     }
 
     /**
@@ -22,9 +46,45 @@ class GameController extends Controller
      */
     public function sendBoardAction()
     {
-        return $this->render('AppBundle:Game:send_board.html.twig', array(
-            // ...
-        ));
+        // replace this example code with whatever you need
+        $board = new BoardService();
+
+        $current_board = $board->initialiseBoard($board->createBoard(),4);
+
+        $board->takePickaxe($current_board,1);
+
+
+        dump($board->getPlayerCard($current_board,1,"all"));
+
+        dump($board->getPlayerCard($current_board,1,"hand"));
+
+        dump($board->getPlayerCard($current_board,1,"rest_down"));
+
+        dump($board->getPlayerCard($current_board,1,"rest_up"));
+
+        $encoders = array(new XmlEncoder(), new JsonEncoder());
+        $normalizers = array(new ObjectNormalizer());
+
+        $serializer = new Serializer($normalizers,$encoders);
+
+        $data = $serializer->serialize($current_board,'xml');
+
+        $game = new Game();
+        $game->setBoard($data);
+        $dt = new \DateTime();
+        $dt->format('Y-m-d H:i:s');
+        $game->setDateIn($dt);
+        $game->setState(false);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $em->persist($game);
+        $em->flush();
+
+        return $this->render('Game/send_board.html.twig', [
+            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'data' => $data
+        ]);
     }
 
 }

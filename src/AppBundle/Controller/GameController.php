@@ -2,31 +2,51 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\AppBundle;
 use AppBundle\Entity\Game;
-use ClassesWithParents\G;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\EventDispatcher\Tests\Service;
-use Symfony\Component\HttpFoundation\Request;
-
 use AppBundle\Service\BoardService;
-use AppBundle\Model\CarteModel;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\ExpressionLanguage\Tests\Node\Obj;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
-
-class DefaultController extends Controller
+class GameController extends Controller
 {
     /**
-     * @Route("/", name="homepage")
+     * @Route("/getBoard")
      */
-    public function indexAction(Request $request)
+    public function getBoardAction()
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $game = $em->getRepository('AppBundle:Game')->find(1);
+        $data = $game->getBoard();
+
+        $serializer = new Serializer(
+            array(new GetSetMethodNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()),
+            array(new XmlEncoder(), new JsonEncoder())
+        );
+
+        $current_board = $serializer->deserialize($data, Game::class, 'xml');
+
+
+        return $this->render('Game/get_board.html.twig', [
+            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * @Route("/sendBoard")
+     */
+    public function sendBoardAction()
     {
         // replace this example code with whatever you need
-        /*
         $board = new BoardService();
 
         $current_board = $board->initialiseBoard($board->createBoard(),4);
@@ -60,16 +80,11 @@ class DefaultController extends Controller
 
         $em->persist($game);
         $em->flush();
-        */
 
-
-
-
-        return $this->render('default/index.html.twig', [
+        return $this->render('Game/send_board.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
             'data' => $data
         ]);
     }
-
 
 }

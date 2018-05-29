@@ -9,6 +9,8 @@ parameters:
     locale: en
 
 framework:
+    templating:
+        engines: ['twig']
     #esi: ~
     #translator: { fallbacks: ['%locale%'] }
     translator: ~
@@ -76,3 +78,9 @@ fos_user:
     from_email:
         address: "yanis.meziane@isen.yncrea.fr"
         sender_name: "FOSBundle"
+# app/config/config.yml
+assetic:
+    debug:          '%kernel.debug%'
+    use_controller: '%kernel.debug%'
+    filters:
+        cssrewrite: ~

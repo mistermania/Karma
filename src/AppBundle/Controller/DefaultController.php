@@ -71,5 +71,11 @@ class DefaultController extends Controller
         ]);
     }
 
-
+    /**
+     * @Route("/game", name="game")
+     */
+    public function testAction(Request $request)
+    {
+        return $this->render('default/game.html.twig');
+    }
 }

@@ -25,14 +25,14 @@ class Game
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="date_in", type="date")
+     * @ORM\Column(name="date_in", type="date", nullable=true)
      */
     private $dateIn;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="board", type="string", length=255)
+     * @ORM\Column(name="board", type="text", length=65535)
      */
     private $board;
 

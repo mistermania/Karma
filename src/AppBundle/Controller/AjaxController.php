@@ -107,7 +107,8 @@ class AjaxController extends Controller
 
         $header = array('nb_player' => $nb_player,
             'current_player' => $current_player,
-            'id_player' => $user->getId());
+            'id_player' => $user->getId(),
+            'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
 
 
         $clean_data = $boardService->cleanSendBoard($board, $user->getId());
@@ -154,6 +155,9 @@ class AjaxController extends Controller
 
                 if ($boardService->moveCard($board, $board[$id_card])) {
 
+                    if($board[$id_card]->getNumber() == 10){
+                        $boardService->putInBin($board);
+                    }
 
                     if($boardService->getPlayerCard($board,$user->getId(),"hand")<3){
                         $boardService->takePickaxe($board,$user->getId());
@@ -173,7 +177,8 @@ class AjaxController extends Controller
 
                     $header = array('nb_player' => $nb_player,
                         'current_player' => $current_player,
-                        'id_player' => $user->getId());
+                        'id_player' => $user->getId(),
+                        'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
 
 
                     $clean_data = $boardService->cleanSendBoard($board, $user->getId());

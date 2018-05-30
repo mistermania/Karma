@@ -76,10 +76,11 @@ class BoardService
         return $board;
     }
 
-    function getRandCardNotUsed($board){
-        $rand = rand(0, 51);
+    function getRandCardNotUsed($board)
+    {
+        $rand = rand(0, count($board)-1);
         while ($board[$rand]->getPlayer() != 0) {
-            $rand = rand(0, 51);
+            $rand = rand(0, count($board)-1);
         }
         return $board[$rand];
     }
@@ -97,9 +98,10 @@ class BoardService
 
     function takePickaxe($board, $player)
     {
-        $rand = rand(0, 51);
+
+        $rand = rand(0, count($board)-1);
         while ($board[$rand]->getState() != "pickaxe") {
-            $rand = rand(0, 51);
+            $rand = rand(0, count($board)-1);
         }
         $board[$rand]->setPlayer($player);
         $board[$rand]->setState("hand");
@@ -133,6 +135,7 @@ class BoardService
                 }
             }
         }
+        return true;
     }
 
     function checkMoveCard($board, $card)
@@ -152,27 +155,42 @@ class BoardService
     function moveCard($board, $card)
     {
         if ($this->checkMoveCard($board, $card)) {
-            if ($this->checkMove()) {
+            if ($this->checkMove($board, $card)) {
+                $this->changeCurrentCard($board,$card->getId());
                 return true;
             }
         }
         return false;
     }
 
-    function cleanSendBoard($board, $player){
+    function changeCurrentCard($board, $id_card)
+    {
+        foreach ($board as $card) {
+            if ($card->getState() == "current_card") {
+                $card->setState("played_card");
+            }
+        }
+        $board[$id_card]->setState("current_card");
+        $board[$id_card]->setPlayer(0);
+    }
+
+    function cleanSendBoard($board, $player)
+    {
         $clean_board = $board;
         foreach ($clean_board as $card) {
             if ($card->getPlayer() != $player) {
                 if ($card->getState() == "rest_down" || $card->getState() == "hand" || $card->getState() == "pickaxe") {
                     $card->setColor("hide");
                     $card->setNumber("hide");
+                    $card->setImage("blue_back.png");
                 }
             }
         }
         return $clean_board;
     }
 
-    function checkCard($board, $card_check){
+    function checkCard($board, $card_check)
+    {
         foreach ($board as $card) {
             if ($card == $card_check) {
                 return true;

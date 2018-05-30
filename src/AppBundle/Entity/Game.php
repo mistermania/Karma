@@ -39,15 +39,15 @@ class Game
     /**
      * @var bool
      *
-     * @ORM\Column(name="state", type="boolean")
+     * @ORM\Column(name="state", type="boolean", nullable = true)
      */
-    private $state;
+    private $state = true;
 
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="games")
-     * @ORM\JoinColumn(name="players_id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="in_game")
+     *
      */
     private $players;
 

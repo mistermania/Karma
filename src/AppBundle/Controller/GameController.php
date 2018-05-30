@@ -37,15 +37,18 @@ class GameController extends Controller
             array(new XmlEncoder(), new JsonEncoder())
         );
 
-        dump($data);
         $current_board = $serializer->deserialize($data, CarteModel::class . '[]' , 'json');
+        dump($current_board);
 
         dump($current_board);
         return $this->render('Game/get_board.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
-            'data' => $data
+            'data' => $data,
+            'current_board' => $current_board
         ]);
     }
+
+    
 
     /**
      * @Route("/sendBoard")
@@ -54,19 +57,14 @@ class GameController extends Controller
     {
         // replace this example code with whatever you need
         $board = new BoardService();
-
         $current_board = $board->initialiseBoard($board->createBoard(),4);
-
         $board->takePickaxe($current_board,1);
 
 
-        dump($board->getPlayerCard($current_board,1,"all"));
-
-        dump($board->getPlayerCard($current_board,1,"hand"));
-
-        dump($board->getPlayerCard($current_board,1,"rest_down"));
-
-        dump($board->getPlayerCard($current_board,1,"rest_up"));
+       // dump($board->getPlayerCard($current_board,1,"all"));
+      //  dump($board->getPlayerCard($current_board,1,"hand"));
+       // dump($board->getPlayerCard($current_board,1,"rest_down"));
+        //dump($board->getPlayerCard($current_board,1,"rest_up"));
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());

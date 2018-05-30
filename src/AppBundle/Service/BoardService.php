@@ -78,9 +78,9 @@ class BoardService
 
     function getRandCardNotUsed($board)
     {
-        $rand = rand(0, count($board)-1);
+        $rand = rand(0, count($board) - 1);
         while ($board[$rand]->getPlayer() != 0) {
-            $rand = rand(0, count($board)-1);
+            $rand = rand(0, count($board) - 1);
         }
         return $board[$rand];
     }
@@ -99,9 +99,9 @@ class BoardService
     function takePickaxe($board, $player)
     {
 
-        $rand = rand(0, count($board)-1);
+        $rand = rand(0, count($board) - 1);
         while ($board[$rand]->getState() != "pickaxe") {
-            $rand = rand(0, count($board)-1);
+            $rand = rand(0, count($board) - 1);
         }
         $board[$rand]->setPlayer($player);
         $board[$rand]->setState("hand");
@@ -156,7 +156,7 @@ class BoardService
     {
         if ($this->checkMoveCard($board, $card)) {
             if ($this->checkMove($board, $card)) {
-                $this->changeCurrentCard($board,$card->getId());
+                $this->changeCurrentCard($board, $card->getId());
                 return true;
             }
         }
@@ -172,6 +172,16 @@ class BoardService
         }
         $board[$id_card]->setState("current_card");
         $board[$id_card]->setPlayer(0);
+    }
+
+    function putInBin($board)
+    {
+        foreach ($board as $card) {
+            if ($card->getState() == "current_card" || $card->getState() == "played_card") {
+                $card->setPlayer(0);
+                $card->setState("hand");
+            }
+        }
     }
 
     function cleanSendBoard($board, $player)

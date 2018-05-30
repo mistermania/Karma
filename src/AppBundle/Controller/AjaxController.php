@@ -60,7 +60,7 @@ class AjaxController extends Controller
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        $json_clean_data = $serializer->serialize($json_array, 'json');
         dump($json_clean_data);
         if ($request->isXmlHttpRequest()) {
 
@@ -115,7 +115,7 @@ class AjaxController extends Controller
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        $json_clean_data = $serializer->serialize($json_array, 'json');
 
 
         if ($request->isXmlHttpRequest()) {
@@ -185,7 +185,7 @@ class AjaxController extends Controller
 
                     $json_array = array('header' => $header,'board' => $clean_data);
                     dump($json_array);
-                    $json_clean_data = $serializer->serialize($clean_data, 'json');
+                    $json_clean_data = $serializer->serialize($json_array, 'json');
 
 
                     if ($request->isXmlHttpRequest()) {

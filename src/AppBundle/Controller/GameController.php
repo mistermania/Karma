@@ -25,7 +25,7 @@ class GameController extends Controller
     {
 
         $em = $this->getDoctrine()->getManager();
-        $game = $em->getRepository('AppBundle:Game')->find(23);
+        $game = $em->getRepository('AppBundle:Game')->find(1);
         $data = $game->getBoard();
 
         $serializer = new Serializer(

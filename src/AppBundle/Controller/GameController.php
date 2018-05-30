@@ -25,8 +25,12 @@ class GameController extends Controller
     {
 
         $em = $this->getDoctrine()->getManager();
-        $game = $em->getRepository('AppBundle:Game')->find(1);
+        $game = $em->getRepository('AppBundle:Game')->find(8);
         $data = $game->getBoard();
+
+        $user = $this->getUser();
+        dump($user->getUserName());
+        dump($user->getId());
 
         $serializer = new Serializer(
             array(new GetSetMethodNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()),
@@ -36,7 +40,7 @@ class GameController extends Controller
         $current_board = $serializer->deserialize($data, CarteModel::class . '[]' , 'json');
         dump($current_board);
 
-
+        dump($current_board);
         return $this->render('Game/get_board.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
             'data' => $data,

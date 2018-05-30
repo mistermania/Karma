@@ -60,9 +60,8 @@ class AjaxController extends Controller
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($json_array, 'json');
-
-
+        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        dump($json_clean_data);
         if ($request->isXmlHttpRequest()) {
 
             return new JsonResponse($json_clean_data);
@@ -115,7 +114,7 @@ class AjaxController extends Controller
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($json_array, 'json');
+        $json_clean_data = $serializer->serialize($clean_data, 'json');
 
 
         if ($request->isXmlHttpRequest()) {
@@ -145,9 +144,9 @@ class AjaxController extends Controller
 
         $user = $this->getUser();
 
-        if($request->query->get('id_card')) {
+        if($request->request->get('id_card')) {
 
-            $id_card = $request->query->get("id_card");
+            $id_card = $request->request->get("id_card");
 
 
             if ($board[$id_card]->getPlayer() == $user->getId()) {
@@ -181,7 +180,7 @@ class AjaxController extends Controller
 
                     $json_array = array('header' => $header,'board' => $clean_data);
                     dump($json_array);
-                    $json_clean_data = $serializer->serialize($json_array, 'json');
+                    $json_clean_data = $serializer->serialize($clean_data, 'json');
 
 
                     if ($request->isXmlHttpRequest()) {

@@ -28,24 +28,24 @@ class BoardService
                 $image = "";
                 switch ($i) {
                     case 0:
-                        $image = $j."C.png";
+                        $image = $j . "C.png";
                         $color = "trefle";
                         break;
                     case 1:
-                        $image = $j."S.png";
+                        $image = $j . "S.png";
                         $color = "pique";
                         break;
                     case 2:
-                        $image = $j."D.png";
+                        $image = $j . "D.png";
                         $color = "carreau";
                         break;
                     case 3:
-                        $image = $j."H.png";
+                        $image = $j . "H.png";
                         $color = "coeur";
                         break;
                 }
 
-                $board[] = new CarteModel($index, $j, $color, "pickaxe", 0,$image);
+                $board[] = new CarteModel($index, $j, $color, "pickaxe", 0, $image);
                 $index = $index + 1;
             }
         }
@@ -76,10 +76,11 @@ class BoardService
         return $board;
     }
 
-    function getRandCardNotUsed($board){
-        $rand = rand(0, 51);
+    function getRandCardNotUsed($board)
+    {
+        $rand = rand(0, count($board)-1);
         while ($board[$rand]->getPlayer() != 0) {
-            $rand = rand(0, 51);
+            $rand = rand(0, count($board)-1);
         }
         return $board[$rand];
     }
@@ -97,9 +98,10 @@ class BoardService
 
     function takePickaxe($board, $player)
     {
-        $rand = rand(0, 51);
+
+        $rand = rand(0, count($board)-1);
         while ($board[$rand]->getState() != "pickaxe") {
-            $rand = rand(0, 51);
+            $rand = rand(0, count($board)-1);
         }
         $board[$rand]->setPlayer($player);
         $board[$rand]->setState("hand");
@@ -133,9 +135,10 @@ class BoardService
                 }
             }
         }
+        return true;
     }
 
-    function checkCard($board, $card)
+    function checkMoveCard($board, $card)
     {
         if ($card->getPlayer() != 0) {
             if ($card->getState() == "hand") {
@@ -151,13 +154,49 @@ class BoardService
 
     function moveCard($board, $card)
     {
-        if ($this->checkCard($board, $card)) {
-            if ($this->checkMove()) {
+        if ($this->checkMoveCard($board, $card)) {
+            if ($this->checkMove($board, $card)) {
+                $this->changeCurrentCard($board,$card->getId());
                 return true;
             }
         }
         return false;
     }
 
+    function changeCurrentCard($board, $id_card)
+    {
+        foreach ($board as $card) {
+            if ($card->getState() == "current_card") {
+                $card->setState("played_card");
+            }
+        }
+        $board[$id_card]->setState("current_card");
+        $board[$id_card]->setPlayer(0);
+    }
+
+    function cleanSendBoard($board, $player)
+    {
+        $clean_board = $board;
+        foreach ($clean_board as $card) {
+            if ($card->getPlayer() != $player) {
+                if ($card->getState() == "rest_down" || $card->getState() == "hand" || $card->getState() == "pickaxe") {
+                    $card->setColor("hide");
+                    $card->setNumber("hide");
+                    $card->setImage("blue_back.png");
+                }
+            }
+        }
+        return $clean_board;
+    }
+
+    function checkCard($board, $card_check)
+    {
+        foreach ($board as $card) {
+            if ($card == $card_check) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

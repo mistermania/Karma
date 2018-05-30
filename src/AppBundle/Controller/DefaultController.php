@@ -30,18 +30,20 @@ class DefaultController extends Controller
         /*
         $board = new BoardService();
 
-        $current_board = $board->initialiseBoard($board->createBoard(),4);
+        $board = $boardService->initialiseBoard($boardService->createBoard(),4);
 
-        $board->takePickaxe($current_board,1);
+        $boardService->takePickaxe($board,1);
+        dump($boardService->getPlayerCard($board,1,"hand"));
 
 
-        dump($board->getPlayerCard($current_board,1,"all"));
+        dump($boardService->getPlayerCard($board,1,"all"));
 
-        dump($board->getPlayerCard($current_board,1,"hand"));
+        dump($boardService->getPlayerCard($board,1,"hand"));
 
-        dump($board->getPlayerCard($current_board,1,"rest_down"));
+        $boardService->takePickaxe($board,1);
+        dump($boardService->getPlayerCard($board,1,"hand"));
 
-        dump($board->getPlayerCard($current_board,1,"rest_up"));
+        dump($boardService->getPlayerCard($board,1,"rest_down"));
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
@@ -68,7 +70,10 @@ class DefaultController extends Controller
 
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'data' => $data
         ]);
+
+
     }
 
     /**

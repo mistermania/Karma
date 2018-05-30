@@ -44,6 +44,8 @@ class GameController extends Controller
         ]);
     }
 
+    
+
     /**
      * @Route("/sendBoard")
      */
@@ -51,19 +53,14 @@ class GameController extends Controller
     {
         // replace this example code with whatever you need
         $board = new BoardService();
-
         $current_board = $board->initialiseBoard($board->createBoard(),4);
-
         $board->takePickaxe($current_board,1);
 
 
-        dump($board->getPlayerCard($current_board,1,"all"));
-
-        dump($board->getPlayerCard($current_board,1,"hand"));
-
-        dump($board->getPlayerCard($current_board,1,"rest_down"));
-
-        dump($board->getPlayerCard($current_board,1,"rest_up"));
+       // dump($board->getPlayerCard($current_board,1,"all"));
+      //  dump($board->getPlayerCard($current_board,1,"hand"));
+       // dump($board->getPlayerCard($current_board,1,"rest_down"));
+        //dump($board->getPlayerCard($current_board,1,"rest_up"));
 
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());

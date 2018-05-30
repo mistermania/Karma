@@ -29,9 +29,10 @@
 
                     } else if (status === "success") {
                         // New data received, do what you want
-                        console.log(JSON.parse(data));
+                        //console.log(JSON.parse(data));
                         var board = JSON.parse(data);
-                        print_data(board, 1, 4, 4);
+                        //console.log(board.board);
+                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
                     }
                 },
                 error: function (error) {
@@ -45,7 +46,19 @@
             var up1 = 0, up2 = 0, up3 = 0, up4 = 0;
             var pos = 6 - parseInt(nbhand / 2);
             if(nbhand > 12)
-                pos = 12 - parseInt(nbhand / 2);
+                pos = 0;
+
+
+            document.getElementById("take").src = "images/empty_back.png";
+            for(var i=1;i<25;i++)
+                document.getElementById("hand"+i).src = "images/empty_back.png";
+            for(var i=1;i<=3;i++){
+                document.getElementById("left"+i).src = "images/empty_back.png";
+                document.getElementById("right"+i).src = "images/empty_back.png";
+                document.getElementById("top"+i).src = "images/empty_back.png";
+                document.getElementById("bottom"+i).src = "images/empty_back.png";
+            }
+
             for (var k in board) {
                 //console.log(board[k].id);
                 if (board[k].state == "current_card") {
@@ -95,7 +108,6 @@
                     document.getElementById("hand" + pos).onclick = function(){hand(this);};
                     document.getElementById("hand" + pos).name = board[k].id;
                 }
-
             }
 
             for (var k in board) { // Second loop in case there are no more rest_up cards but there are rest_down
@@ -151,9 +163,8 @@
 
                     } else if (status === "success") {
                         // New data received, do what you want
-                        console.log(JSON.parse(data));
                         var board = JSON.parse(data);
-                        print_data(board, 1, 4, 4);
+                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
                     }
                 },
                 error: function (error) {
@@ -179,9 +190,8 @@
 
                     } else if (status === "success") {
                         // New data received, do what you want
-                        console.log(data);
                         var board = JSON.parse(data);
-                        print_data(board, 1, 4, 4);
+                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
                     }
                 },
                 error: function (error) {

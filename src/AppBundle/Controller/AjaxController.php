@@ -60,7 +60,7 @@ class AjaxController extends Controller
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        $json_clean_data = $serializer->serialize($json_array, 'json');
         dump($json_clean_data);
         if ($request->isXmlHttpRequest()) {
 
@@ -107,14 +107,15 @@ class AjaxController extends Controller
 
         $header = array('nb_player' => $nb_player,
             'current_player' => $current_player,
-            'id_player' => $user->getId());
+            'id_player' => $user->getId(),
+            'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
 
 
         $clean_data = $boardService->cleanSendBoard($board, $user->getId());
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        $json_clean_data = $serializer->serialize($json_array, 'json');
 
 
         if ($request->isXmlHttpRequest()) {
@@ -173,14 +174,15 @@ class AjaxController extends Controller
 
                     $header = array('nb_player' => $nb_player,
                         'current_player' => $current_player,
-                        'id_player' => $user->getId());
+                        'id_player' => $user->getId(),
+                        'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
 
 
                     $clean_data = $boardService->cleanSendBoard($board, $user->getId());
 
                     $json_array = array('header' => $header,'board' => $clean_data);
                     dump($json_array);
-                    $json_clean_data = $serializer->serialize($clean_data, 'json');
+                    $json_clean_data = $serializer->serialize($json_array, 'json');
 
 
                     if ($request->isXmlHttpRequest()) {

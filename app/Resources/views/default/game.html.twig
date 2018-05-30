@@ -2,18 +2,195 @@
 
 {% block javascripts %}
     <script>
+        function al(){
+            alert("!");
+        }
         function load() {
-            alert("Loading...");
-            document.getElementById("top"+"2").src = "{{ asset('images/gray_back.png') }}";
+            //alert("Loading...");
+            document.getElementById("top" + "2").src = "images/gray_back.png";
+            var req = $.ajax({
+                url: "/game",
+                type: "POST",
+                dataType: "json",
+                data: {"id_card": 1},
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+                        $.ajax({
+                            type: this.type,
+                            dataType: this.dataType,
+                            url: this.url,
+                            ifModified: false,
+                            success: this.success,
+                            error: this.error,
+                            complete: this.complete
+                        });
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        console.log(JSON.parse(data));
+                        var board = JSON.parse(data);
+                        print_data(board, 1, 4, 4);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
         }
-        function pickaxe() {
-            alert("Pickaxe");
+
+        function print_data(board, player, nbplayer, nbhand) {
+            var up1 = 0, up2 = 0, up3 = 0, up4 = 0;
+            var pos = 6 - parseInt(nbhand / 2);
+            if(nbhand > 12)
+                pos = 12 - parseInt(nbhand / 2);
+            for (var k in board) {
+                //console.log(board[k].id);
+                if (board[k].state == "current_card") {
+                    document.getElementById("take").src = "images/" + board[k].image;
+                }
+                else if (board[k].state == "rest_up") {
+                    if (board[k].player == player) {
+                        up1++;
+                        document.getElementById("bottom" + up1).src = "images/" + board[k].image;
+                        //console.log(board[k].id);
+                        document.getElementById("bottom" + up1).onclick = function(){hand(this);};
+                        document.getElementById("bottom" + up1).name = board[k].id;
+                    }
+                    else if (nbplayer == 2 && board[k].player == (player) % 2 + 1) {
+                        up3++;
+                        document.getElementById("top" + up3).src = "images/" + board[k].image;
+                    }
+                    else if (nbplayer == 3) {
+                        if (board[k].player == (player) % 3 + 1) {
+                            up2++;
+                            document.getElementById("left" + up2).src = "images/" + board[k].image;
+                        }
+                        else if (board[k].player == (player + 1) % 3 + 1) {
+                            up4++;
+                            document.getElementById("right" + up4).src = "images/" + board[k].image;
+                        }
+                    }
+                    else if (nbplayer == 4) {
+                        if (board[k].player == (player) % 4 + 1) {
+                            up2++;
+                            document.getElementById("left" + up2).src = "images/" + board[k].image;
+                        }
+                        else if (board[k].player == (player + 1) % 4 + 1) {
+                            up3++;
+                            document.getElementById("top" + up3).src = "images/" + board[k].image;
+                        }
+                        else if (board[k].player == (player + 2) % 4 + 1) {
+                            up4++;
+                            document.getElementById("right" + up4).src = "images/" + board[k].image;
+                        }
+                    }
+                }
+                else if (board[k].state == "hand" && board[k].player == player && nbhand > 0) {
+                    pos++;
+                    console.log(pos);
+                    document.getElementById("hand" + pos).src = "images/" + board[k].image;
+                    document.getElementById("hand" + pos).onclick = function(){hand(this);};
+                    document.getElementById("hand" + pos).name = board[k].id;
+                }
+
+            }
+
+            for (var k in board) { // Second loop in case there are no more rest_up cards but there are rest_down
+                if (board[k].state == "rest_down") {
+                    if (board[k].player == player && up1 < 3) {
+                        up1++;
+                        document.getElementById("bottom" + up1).src = "images/blue_back.png";
+
+                    }
+                    else if (nbplayer == 2 && board[k].player == (player) % 2 + 1 && up3 < 3) {
+                        up3++;
+                        document.getElementById("top" + up3).src = "images/blue_back.png";
+                    }
+                    else if (nbplayer == 3) {
+                        if (board[k].player == (player) % 3 + 1 && up2 < 3) {
+                            up2++;
+                            document.getElementById("left" + up2).src = "images/blue_back.png";
+                        }
+                        else if (board[k].player == (player + 1) % 3 + 1 && up4 < 3) {
+                            up4++;
+                            document.getElementById("right" + up4).src = "images/blue_back.png";
+                        }
+                    }
+                    else if (nbplayer == 4) {
+                        if (board[k].player == (player) % 4 + 1 && up2 < 3) {
+                            up2++;
+                            document.getElementById("left" + up2).src = "images/blue_back.png";
+                        }
+                        else if (board[k].player == (player + 1) % 4 + 1 && up3 < 3) {
+                            up3++;
+                            document.getElementById("top" + up3).src = "images/blue_back.png";
+                        }
+                        else if (board[k].player == (player + 2) % 4 + 1 && up4 < 3) {
+                            up4++;
+                            document.getElementById("right" + up4).src = "images/blue_back.png";
+                        }
+                    }
+                }
+            }
+
         }
-        function rest(i) {
-            alert("Rest "+i);
+
+        function take() {
+            alert("Take");
+            var req = $.ajax({
+                url: "/game",
+                type: "POST",
+                dataType: "json",
+                data: {"id_card": 1},
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        console.log(JSON.parse(data));
+                        var board = JSON.parse(data);
+                        console.log(board[1].image);
+                        print_data(board);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
         }
-        function hand(i) {
-            alert("Hand "+i);
+
+        function hand(el) {
+            alert("Hand"+el.name);
+            //console.log(el.name);
+            //data: {"id_card": id},
+            var req = $.ajax({
+                url: "/game",
+                type: "POST",
+                dataType: "json",
+                data: {"id_card": el.name},
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        console.log(data);
+                        var board = JSON.parse(data);
+                        print_data(board, 1, 4, 4);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
         }
     </script>
 {% endblock %}
@@ -22,128 +199,165 @@
     <main class="container">
         <div class="row">
             <div class="col s2 offset-s3">
-                <img id="top1" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;transform: translate(50%);"/>
+                <img id="top1" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:75%;transform: translate(50%);"/>
             </div>
             <div class="col s2">
                 <img id="top2" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;"/>
 
             </div>
             <div class="col s2">
-                <img id="top3" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;transform: translate(-50%);"/>
+                <img id="top3" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:75%;transform: translate(-50%);"/>
             </div>
         </div>
         <div class="row">
             <div class="col s2">
-                <img id="left3" src="{{ asset('images/blue_back.png') }}" style="transform: rotate(90deg)translate(-100%,-75%);height:auto;max-width:75%;"/>
+                <img id="left3" src="{{ asset('images/blue_back.png') }}"
+                     style="transform: rotate(90deg)translate(-100%,-75%);height:auto;max-width:75%;"/>
             </div>
             <div class="col s2 offset-s3">
-                <img id="pickaxe" onclick="pickaxe()" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;"/>
+                <img id="take" onclick="take()" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:75%;"/>
             </div>
             <div class="col s2 offset-s3">
-                <img id="right3" src="{{ asset('images/blue_back.png') }}" style="transform: rotate(90deg)translate(-100%,75%);height:auto;max-width:75%;"/>
+                <img id="right3" src="{{ asset('images/blue_back.png') }}"
+                     style="transform: rotate(90deg)translate(-100%,75%);height:auto;max-width:75%;"/>
             </div>
         </div>
         <div class="row">
             <div class="col s2">
-                <img id="left2" src="{{ asset('images/blue_back.png') }}" style="transform: rotate(90deg)translate(-175%,-75%);height:auto;max-width:75%;"/>
+                <img id="left2" src="{{ asset('images/blue_back.png') }}"
+                     style="transform: rotate(90deg)translate(-175%,-75%);height:auto;max-width:75%;"/>
             </div>
             <div class="col s2 offset-s8">
-                <img id="right2" src="{{ asset('images/blue_back.png') }}" style="transform: rotate(90deg)translate(-175%,75%);height:auto;max-width:75%;"/>
+                <img id="right2" src="{{ asset('images/blue_back.png') }}"
+                     style="transform: rotate(90deg)translate(-175%,75%);height:auto;max-width:75%;"/>
             </div>
         </div>
         <div class="row">
             <div class="col s2">
-                <img id="left1" src="{{ asset('images/blue_back.png') }}" style="transform: rotate(90deg)translate(-250%,-75%);height:auto;max-width:75%;"/>
+                <img id="left1" src="{{ asset('images/blue_back.png') }}"
+                     style="transform: rotate(90deg)translate(-250%,-75%);height:auto;max-width:75%;"/>
             </div>
             <div class="col s2 offset-s8">
-                <img id="right1" src="{{ asset('images/blue_back.png') }}" style="transform: rotate(90deg)translate(-250%,75%);height:auto;max-width:75%;"/>
+                <img id="right1" src="{{ asset('images/blue_back.png') }}"
+                     style="transform: rotate(90deg)translate(-250%,75%);height:auto;max-width:75%;"/>
             </div>
         </div>
         <div class="row">
             <div class="col s2 offset-s3">
-                <img onclick="rest(1)" id="rest1" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;transform:translate(50%,-225%);"/>
+                <img id="bottom1" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:75%;transform:translate(50%,-225%);"/>
             </div>
             <div class="col s2">
-                <img onclick="rest(2)" id="rest2" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;transform:translate(0,-225%);"/>
+                <img id="bottom2" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:75%;transform:translate(0,-225%);"/>
 
             </div>
             <div class="col s2">
-                <img onclick="rest(3)" id="rest3" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:75%;transform:translate(-50%,-225%);"/>
+                <img id="bottom3" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:75%;transform:translate(-50%,-225%);"/>
             </div>
         </div>
         <div class="row">
             <div class="col s1">
-                <img id="hand1" onclick="hand(1)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand1" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand2" onclick="hand(2)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand2" onclick="hand(2)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand3" onclick="hand(3)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand3" onclick="hand(3)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand4" onclick="hand(4)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand4" onclick="hand(4)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand5" onclick="hand(5)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand5" onclick="hand(5)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand6" onclick="hand(6)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand6" onclick="hand(6)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand7" onclick="hand(7)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand7" onclick="hand(7)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand8" onclick="hand(8)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand8" onclick="hand(8)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand9" onclick="hand(9)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand9" onclick="hand(9)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand10" onclick="hand(10)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand10" onclick="hand(10)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand11" onclick="hand(11)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand11" onclick="hand(11)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand12" onclick="hand(12)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand12" onclick="hand(12)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
-        </div><div class="row">
+        </div>
+        <div class="row">
             <div class="col s1">
-                <img id="hand13" onclick="hand(13)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
-            </div>
-            <div class="col s1">
-                <img id="hand14" onclick="hand(14)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
-            </div>
-            <div class="col s1">
-                <img id="hand15" onclick="hand(15)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand13" onclick="hand(13)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand16" onclick="hand(16)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand14" onclick="hand(14)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand17" onclick="hand(17)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand15" onclick="hand(15)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand18" onclick="hand(18)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand16" onclick="hand(16)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand19" onclick="hand(19)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand17" onclick="hand(17)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand20" onclick="hand(20)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand18" onclick="hand(18)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand21" onclick="hand(21)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand19" onclick="hand(19)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand22" onclick="hand(22)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand20" onclick="hand(20)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand23" onclick="hand(23)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand21" onclick="hand(21)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand24" onclick="hand(24)" src="{{ asset('images/blue_back.png') }}" class="responsive-img" style="max-width:125%;transform:translate(0,-325%);"/>
+                <img id="hand22" onclick="hand(22)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
+            </div>
+            <div class="col s1">
+                <img id="hand23" onclick="hand(23)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
+            </div>
+            <div class="col s1">
+                <img id="hand24" onclick="hand(24)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                     style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
         </div>
 

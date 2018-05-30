@@ -7,12 +7,12 @@
         }
         function load() {
             //alert("Loading...");
-            document.getElementById("top" + "2").src = "images/gray_back.png";
+            //document.getElementById("top" + "2").src = "images/gray_back.png";
             var req = $.ajax({
-                url: "/game",
+                url: "/ajax/",
                 type: "POST",
                 dataType: "json",
-                data: {"id_card": 1},
+                //data: {"id_card": 1},
                 ifModified: true,
                 success: function (data, status) {
                     if (data === undefined && status == "notmodified") {
@@ -141,10 +141,9 @@
         function take() {
             alert("Take");
             var req = $.ajax({
-                url: "/game",
+                url: "/ajax/take_played_card",
                 type: "POST",
                 dataType: "json",
-                data: {"id_card": 1},
                 ifModified: true,
                 success: function (data, status) {
                     if (data === undefined && status == "notmodified") {
@@ -154,8 +153,7 @@
                         // New data received, do what you want
                         console.log(JSON.parse(data));
                         var board = JSON.parse(data);
-                        console.log(board[1].image);
-                        print_data(board);
+                        print_data(board, 1, 4, 4);
                     }
                 },
                 error: function (error) {
@@ -166,11 +164,11 @@
         }
 
         function hand(el) {
-            alert("Hand"+el.name);
+            //alert("Hand"+el.name);
             //console.log(el.name);
             //data: {"id_card": id},
             var req = $.ajax({
-                url: "/game",
+                url: "/ajax/move_card",
                 type: "POST",
                 dataType: "json",
                 data: {"id_card": el.name},

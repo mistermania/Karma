@@ -197,6 +197,7 @@ class AjaxController extends Controller
                     $json_erreur = array('erreur' => "Le deplacement n'est pas possible ");
 
                     $json_clean_data = json_encode($json_erreur);
+                    return new JsonResponse($json_clean_data);
                 }
 
 
@@ -204,11 +205,13 @@ class AjaxController extends Controller
                 $json_erreur = array('erreur' => "La carte n'appartient pas au joueur");
 
                 $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
             }
         }else{
             $json_erreur = array('erreur' => "URL incorrect");
 
             $json_clean_data = json_encode($json_erreur);
+            return new JsonResponse($json_clean_data);
         }
 
 

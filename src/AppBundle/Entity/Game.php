@@ -23,6 +23,14 @@ class Game
     private $id;
 
     /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="date_in", type="date", nullable=true)
@@ -37,11 +45,40 @@ class Game
     private $board;
 
     /**
-     * @var bool
+     * @var int
      *
-     * @ORM\Column(name="state", type="boolean", nullable = true)
+     * @ORM\Column(name="state", type="integer", nullable = true)
      */
     private $state = true;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="tour", type="integer", nullable = true)
+     */
+    private $tourJoueur;
+
+    /**
+     * Get tourJoueur
+     *
+     * @return int
+     */
+    public function getTourJoueur()
+    {
+        return $this->tourJoueur;
+    }
+
+    /**
+     * Set state
+     *
+     * @param int $tourJoueur
+     *
+     * @return Game
+     */
+    public function setTourJoueur($tourJoueur)
+    {
+        $this->tourJoueur = $tourJoueur;
+    }
 
     /**
      * @var User
@@ -113,7 +150,7 @@ class Game
     /**
      * Set state
      *
-     * @param boolean $state
+     * @param int $state
      *
      * @return Game
      */
@@ -127,7 +164,7 @@ class Game
     /**
      * Get state
      *
-     * @return bool
+     * @return int
      */
     public function getState()
     {

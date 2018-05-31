@@ -218,7 +218,10 @@ class AjaxController extends Controller
 
     private function getBoardBDD(){
         $em = $this->getDoctrine()->getManager();
-        $game = $em->getRepository('AppBundle:Game')->findOneBy([],['id' => 'DESC'],1);
+       // $game = $em->getRepository('AppBundle:Game')->findOneBy([],['id' => 'DESC'],1);
+      //  $data = $game->getBoard();
+        $user = $this->getUser();
+        $game = $em->getRepository('AppBundle:Game')->find($user->getInGame()->getId());
         $data = $game->getBoard();
 
         $serializer = new Serializer(
@@ -238,17 +241,27 @@ class AjaxController extends Controller
         $serializer = new Serializer($normalizers,$encoders);
 
         $data = $serializer->serialize($board,'json');
+        $user = $this->getUser();
 
-        $game = new Game();
+        $em = $this->getDoctrine()->getManager();
+        $game = $em->getRepository("AppBundle:Game")->find($user->getInGame()->getId());
         $game->setBoard($data);
+
         $dt = new \DateTime();
         $dt->format('Y-m-d H:i:s');
         $game->setDateIn($dt);
         $game->setState(false);
 
-        $em = $this->getDoctrine()->getManager();
+        $em->flush();
+    }
 
-        $em->persist($game);
+    private function passeTourBDD(){
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $game = $em->getRepository("AppBundle:Game")->find($user->getInGame()->getId());
+        if($game->getTourJoueur() == 4) $game->setTourJoueur(1);
+        else $game->setTourJoueur(($game->getTourJoueur()+1));
+
         $em->flush();
     }
 }

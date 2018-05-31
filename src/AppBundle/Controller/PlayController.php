@@ -65,15 +65,30 @@ class PlayController extends Controller
                     array('in_game' => $indice)
                 );
                 dump($test);
-                if (count($test)<4 && count($test)>0){
+                if(count($test) == 3){
                     if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
                         $user->setInGame($game);
+                        $user->setIdInGame(4);
                         $indice = 0;
                     }
-
+                }
+                else if(count($test) == 2){
+                    if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
+                        $user->setInGame($game);
+                        $user->setIdInGame(3);
+                        $indice = 0;
+                    }
+                }
+                else if(count($test) == 1){
+                    if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
+                        $user->setInGame($game);
+                        $user->setIdInGame(2);
+                        $indice = 0;
+                    }
                 }
                 else if(count($test) == 0){
                     $user->setInGame($game);
+                    $user->setIdInGame(1);
                     $indice=0;
                 }
                 else{

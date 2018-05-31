@@ -29,7 +29,7 @@ class PlayController extends Controller
         if($user->isWantPlay() == false && $user->getInGame() == null){
             while ($indice>0) {
                 $user->setWantPlay(true);
-                $game = $em->getRepository('AppBundle:Game')->find(100);
+                $game = $em->getRepository('AppBundle:Game')->find($indice);
                 if($game == null){
                     $board = new BoardService();
                     $current_board = $board->initialiseBoard($board->createBoard(),4);
@@ -54,6 +54,7 @@ class PlayController extends Controller
                     $dt->format('Y-m-d H:i:s');
                     $game->setDateIn($dt);
                     $game->setState(false);
+                    $game->setTourJoueur(1);
 
                     $em2 = $this->getDoctrine()->getManager();
 
@@ -64,15 +65,30 @@ class PlayController extends Controller
                     array('in_game' => $indice)
                 );
                 dump($test);
-                if (count($test)<4 && count($test)>0){
-                    if(($test[0])->isWantPlay() == true){
+                if(count($test) == 3){
+                    if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
                         $user->setInGame($game);
+                        $user->setIdInGame(4);
                         $indice = 0;
                     }
-
+                }
+                else if(count($test) == 2){
+                    if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
+                        $user->setInGame($game);
+                        $user->setIdInGame(3);
+                        $indice = 0;
+                    }
+                }
+                else if(count($test) == 1){
+                    if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
+                        $user->setInGame($game);
+                        $user->setIdInGame(2);
+                        $indice = 0;
+                    }
                 }
                 else if(count($test) == 0){
                     $user->setInGame($game);
+                    $user->setIdInGame(1);
                     $indice=0;
                 }
                 else{
@@ -89,22 +105,62 @@ class PlayController extends Controller
         ]);
     }
 
+
     /**
-     * @Route("end")
+     * @Route("/lobby")
      */
-    public function endAction(){
+    public function LobbyAction(){
         $em = $this->getDoctrine()->getManager();
-        $userid = $this->getUser()->getId();
-        $user = $em->getRepository('AppBundle:User')->find($userid);
+        $user = $this->getUser();
 
-        $user->setWantPlay(false);
-        $user->setInGame(null);
+        if($user->isWantPlay() == true) {
+            $userList = $em->getRepository('AppBundle:User')->findBy(
+                array('in_game' => $user->getInGame())
+            );
 
+            $indice = 0;
+            $nameList[0] = "";
+            foreach ($userList as $usertemp) {
+                $nameList[$indice] = $usertemp->getUsername();
+                $indice = +1;
+            }
+            return $this->render('play/lobby.html.twig', [
+                'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
+                'nameList' => $nameList
+            ]);
+
+        }
+
+        else{
+            $nameList[0] = "Vous ne voulez pas jouer";
+            return $this->render('play/lobby.html.twig', [
+                'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
+                'nameList' => $nameList
+            ]);
+        }
+
+
+    }
+
+    /**
+     * @Route("/startGame")
+     */
+    public function startGameAction(){
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+
+        $game = $em->getRepository("AppBundle:Game")->find($user->getInGame()->getId());
+        $game->setState(1);
+        $userList = $em->getRepository('AppBundle:User')->findBy(
+            array('in_game' => $user->getInGame())
+        );
+
+        foreach ($userList as $player){
+            $player->setWantPlay(false);
+        }
         $em->flush();
-        return $this->render('play/create.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
-        ]);
 
+        return $this->render('Play/start.html.twig');
 
     }
 

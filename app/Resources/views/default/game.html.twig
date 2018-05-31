@@ -36,8 +36,6 @@
                     }
                 },
                 error: function (error) {
-                    window.Materialize.toast('I am a toast!', 4000);
-                    M.toast({html: 'I am a toast!'});
                     console.log("Error:");
                     console.log(error);
                 }
@@ -54,8 +52,11 @@
             document.getElementById("text2").innerText = "You are Player "+player;
 
             document.getElementById("take").src = "images/empty_back.png";
-            for(var i=1;i<25;i++)
+            for(var i=1;i<25;i++){
                 document.getElementById("hand"+i).src = "images/empty_back.png";
+                document.getElementById("hand"+i).name = -1;
+
+            }
             for(var i=1;i<=3;i++){
                 document.getElementById("left"+i).src = "images/empty_back.png";
                 document.getElementById("right"+i).src = "images/empty_back.png";
@@ -112,9 +113,10 @@
 
                 else if (board[k].state == "hand" && board[k].player == player && nbhand > 0) {
                     pos++;
-                    console.log(pos);
+                    //console.log(pos);
                     document.getElementById("hand" + pos).src = "images/" + board[k].image;
                     document.getElementById("hand" + pos).onclick = function(){hand(this);};
+                    //console.log(board[k].id);
                     document.getElementById("hand" + pos).name = board[k].id;
                 }
             }
@@ -185,7 +187,7 @@
 
         function hand(el) {
             //alert("Hand"+el.name);
-            //console.log(el.name);
+            //console.log(el.name.toString());
             //data: {"id_card": id},
             var req = $.ajax({
                 url: "/ajax/move_card",

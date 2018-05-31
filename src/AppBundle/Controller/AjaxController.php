@@ -145,7 +145,7 @@ class AjaxController extends Controller
 
         $user = $this->getUser();
 
-        if($request->request->get('id_card')) {
+        if($request->request->get("id_card")) {
 
             $id_card = $request->request->get("id_card");
 

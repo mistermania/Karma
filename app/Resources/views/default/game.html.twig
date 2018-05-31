@@ -151,7 +151,6 @@
         }
 
         function take() {
-            alert("Take");
             var req = $.ajax({
                 url: "/ajax/take_played_card",
                 type: "POST",
@@ -191,6 +190,53 @@
                     } else if (status === "success") {
                         // New data received, do what you want
                         var board = JSON.parse(data);
+                        console.log(board);
+                        if(board.multiple !== undefined) {
+                            console.log(board.multiple);
+                            setMutipleCardModal(board.multiple);
+                        }
+                        else{
+                            print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
+        }
+
+
+
+        $(document).ready(function(){
+         //   setMutipleCardModal(3);
+        });
+
+        function setMutipleCardModal(id_card){
+            $('#modal1').modal({
+                dismissible: false
+            });
+            $('#modal1').modal('open');
+            document.getElementById("id_mutiple_card").innerHTML = id_card;
+
+        };
+        function multipleCard(choice) {
+            var id_card = document.getElementById("id_mutiple_card").value;
+            var req = $.ajax({
+                url: "/ajax/move_multiple_card",
+                type: "POST",
+                dataType: "json",
+                data: "{'id_card':"+id_card+"}",
+                ifModified: true,
+                success: function (data, status) {
+                    console.log(data);
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        var board = JSON.parse(data);
                         print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
                     }
                 },
@@ -200,10 +246,29 @@
                 }
             });
         }
+
     </script>
 {% endblock %}
 
 {% block main %}
+
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h4>Multiple cards</h4>
+            <p>How many cards do you want played ?</p>
+        </div>
+        <div class="modal-footer">
+            <div id="id_mutiple_card" hidden></div>
+            <a onclick="multipleCard('one')" class="modal-close waves-effect waves-green btn-flat">Play ONE</a>
+            <a onclick="multipleCard('all')" class="modal-close waves-effect waves-green btn-flat">Play ALL</a>
+        </div>
+    </div>
+
+
+
+
     <main class="container">
         <div class="row">
             <div class="col s2 offset-s3">
@@ -370,4 +435,7 @@
         </div>
 
     </main>
+
+
+
 {% endblock %}

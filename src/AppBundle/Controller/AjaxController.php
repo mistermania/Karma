@@ -153,7 +153,107 @@ class AjaxController extends Controller
             if ($board[$id_card]->getPlayer() == $user->getId()) {
 
 
-                if ($boardService->moveCard($board, $board[$id_card])) {
+                if ($boardService->checkMoveCardTot($board, $board[$id_card])) {
+
+                    if($boardService->numberSameCard($board,$board[$id_card])>1){
+                        $json_erreur = array('multiple' => $id_card);
+
+                        $json_clean_data = json_encode($json_erreur);
+                        return new JsonResponse($json_clean_data);
+                    }
+
+                    $boardService->moveCard($board, $board[$id_card]);
+                    if($board[$id_card]->getNumber() == 10){
+                        $boardService->putInBin($board);
+                    }
+
+                    if($boardService->getPlayerCard($board,$user->getId(),"hand")<3){
+                        $boardService->takePickaxe($board,$user->getId());
+                    }
+
+
+                    $this->addBoardBDD($board);
+
+
+                    $encoders = [new JsonEncoder()];
+                    $normalizers = [new ObjectNormalizer(), new ArrayDenormalizer()];
+                    $serializer = new Serializer($normalizers, $encoders);
+
+
+                    $nb_player = 4;
+                    $current_player = 1;
+
+                    $header = array('nb_player' => $nb_player,
+                        'current_player' => $current_player,
+                        'id_player' => $user->getId(),
+                        'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
+
+
+                    $clean_data = $boardService->cleanSendBoard($board, $user->getId());
+
+                    $json_array = array('header' => $header,'board' => $clean_data);
+                    dump($json_array);
+                    $json_clean_data = $serializer->serialize($json_array, 'json');
+
+
+                    if ($request->isXmlHttpRequest()) {
+
+                        return new JsonResponse($json_clean_data);
+
+                    }
+                } else {
+                    $json_erreur = array('erreur' => "Le deplacement n'est pas possible ");
+
+                    $json_clean_data = json_encode($json_erreur);
+                    return new JsonResponse($json_clean_data);
+                }
+
+
+            } else {
+                $json_erreur = array('erreur' => "La carte n'appartient pas au joueur");
+
+                $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
+            }
+        }else{
+            $json_erreur = array('erreur' => "URL incorrect");
+
+            $json_clean_data = json_encode($json_erreur);
+            return new JsonResponse($json_clean_data);
+        }
+
+
+
+
+        return $this->render('Game/get_board.html.twig', [
+            'base_dir' => realpath($this->getParameter('kernel.project_dir')) . DIRECTORY_SEPARATOR,
+            'data' => $json_clean_data
+        ]);
+    }
+    /**
+     * @Route("/move_multiple_card", name="app_ajax_move_multiple")
+     */
+    public function moveMultipleCard(Request $request)
+    {
+        //recupère le tableau en bdd
+
+        $board = $this->getBoardBDD();
+
+        dump($board);
+
+        $boardService = new BoardService();
+
+        $user = $this->getUser();
+
+        if($request->request->get('id_card')) {
+
+            $id_card = $request->request->get("id_card");
+
+
+            if ($board[$id_card]->getPlayer() == $user->getId()) {
+
+
+                if ($boardService->checkMoveCardTot($board,$board[$id_card])) {
 
                     if($board[$id_card]->getNumber() == 10){
                         $boardService->putInBin($board);
@@ -197,6 +297,7 @@ class AjaxController extends Controller
                     $json_erreur = array('erreur' => "Le deplacement n'est pas possible ");
 
                     $json_clean_data = json_encode($json_erreur);
+                    return new JsonResponse($json_clean_data);
                 }
 
 
@@ -204,11 +305,13 @@ class AjaxController extends Controller
                 $json_erreur = array('erreur' => "La carte n'appartient pas au joueur");
 
                 $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
             }
         }else{
             $json_erreur = array('erreur' => "URL incorrect");
 
             $json_clean_data = json_encode($json_erreur);
+            return new JsonResponse($json_clean_data);
         }
 
 
@@ -219,6 +322,7 @@ class AjaxController extends Controller
             'data' => $json_clean_data
         ]);
     }
+
 
 
     private function getBoardBDD(){

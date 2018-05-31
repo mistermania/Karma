@@ -96,15 +96,27 @@ class BoardService
         return $board;
     }
 
+    function isPickaxe($board)
+    {
+        foreach ($board as $card) {
+            if ($card->getState() == "pickaxe") {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function takePickaxe($board, $player)
     {
-
-        $rand = rand(0, count($board) - 1);
-        while ($board[$rand]->getState() != "pickaxe") {
+        if ($this->isPickaxe($board)) {
             $rand = rand(0, count($board) - 1);
+
+            while ($board[$rand]->getState() != "pickaxe") {
+                $rand = rand(0, count($board) - 1);
+            }
+            $board[$rand]->setPlayer($player);
+            $board[$rand]->setState("hand");
         }
-        $board[$rand]->setPlayer($player);
-        $board[$rand]->setState("hand");
         return $board;
     }
 
@@ -120,6 +132,8 @@ class BoardService
         }
         return $nb_card;
     }
+
+
 
     function checkMove($board, $card_move)
     {
@@ -161,6 +175,37 @@ class BoardService
             }
         }
         return false;
+    }
+
+    function checkMoveCardTot($board, $card)
+    {
+        if ($this->checkMoveCard($board, $card)) {
+            if ($this->checkMove($board, $card)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function moveMultipleCard($board,$card_move){
+        foreach ($board as $card) {
+            if ($card->getNumber() == $card_move->getNumber()) {
+                if(!$this->moveCard($board,$card)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function numberSameCard($board,$card_model){
+        $number = 0;
+        foreach ($board as $card) {
+            if ($card->getNumber() == $card_model->getNumber() && $card->getPlayer() == $card_model->getPlayer()) {
+                $number++;
+            }
+        }
+        return $number;
     }
 
     function changeCurrentCard($board, $id_card)

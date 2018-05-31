@@ -2,12 +2,13 @@
 
 {% block javascripts %}
     <script>
+        var interval;
         function start() {
-            setInterval(load, 1000);
+            interval = setInterval(load, 1000);
             load();
         }
 
-        function kill(){
+        function kill() {
             var req = $.ajax({
                 url: "/lobby/kill",
                 type: "POST",
@@ -57,7 +58,15 @@
                         //console.log(JSON.parse(data));
                         var board = JSON.parse(data);
                         console.log(board);
-                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
+                        if (board.board !== undefined) {
+                            print_data(board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
+                        } else if (board.kill !== undefined) {
+                            clearInterval(interval);
+                            $('.modal').modal();
+                            $('#modal').modal('open');
+                            $('#modal').modal('modal').options.dismissible = true;
+
+                        }
                     }
                 },
                 error: function (error) {
@@ -70,24 +79,24 @@
         function print_data(board, player, nbplayer, nbhand, nbcurrentplayer) {
             var up1 = 0, up2 = 0, up3 = 0, up4 = 0;
             var pos = 6 - parseInt(nbhand / 2);
-            if(nbhand > 12)
+            if (nbhand > 12)
                 pos = 0;
 
-            document.getElementById("text1").innerText = "Tour Player "+nbcurrentplayer;
-            document.getElementById("text2").innerText = "You are Player "+player;
+            document.getElementById("text1").innerText = "Tour Player " + nbcurrentplayer;
+            document.getElementById("text2").innerText = "You are Player " + player;
 
             document.getElementById("take").src = "images/empty_back.png";
-            for(var i=1;i<25;i++){
-                document.getElementById("hand"+i).src = "images/empty_back.png";
-                document.getElementById("hand"+i).name = -1;
+            for (var i = 1; i < 25; i++) {
+                document.getElementById("hand" + i).src = "images/empty_back.png";
+                document.getElementById("hand" + i).name = -1;
 
             }
-            for(var i=1;i<=3;i++){
-                document.getElementById("left"+i).src = "images/empty_back.png";
-                document.getElementById("right"+i).src = "images/empty_back.png";
-                document.getElementById("top"+i).src = "images/empty_back.png";
-                document.getElementById("bottom"+i).src = "images/empty_back.png";
-                document.getElementById("bottom"+i).name = -1;
+            for (var i = 1; i <= 3; i++) {
+                document.getElementById("left" + i).src = "images/empty_back.png";
+                document.getElementById("right" + i).src = "images/empty_back.png";
+                document.getElementById("top" + i).src = "images/empty_back.png";
+                document.getElementById("bottom" + i).src = "images/empty_back.png";
+                document.getElementById("bottom" + i).name = -1;
             }
 
             for (var k in board) {
@@ -100,7 +109,9 @@
                         up1++;
                         document.getElementById("bottom" + up1).src = "images/" + board[k].image;
                         //console.log(board[k].id);
-                        document.getElementById("bottom" + up1).onclick = function(){hand(this);};
+                        document.getElementById("bottom" + up1).onclick = function () {
+                            hand(this);
+                        };
                         document.getElementById("bottom" + up1).name = board[k].id;
                     }
                     else if (nbplayer == 2 && board[k].player == (player) % 2 + 1) {
@@ -141,7 +152,9 @@
                     pos++;
                     //console.log(pos);
                     document.getElementById("hand" + pos).src = "images/" + board[k].image;
-                    document.getElementById("hand" + pos).onclick = function(){hand(this);};
+                    document.getElementById("hand" + pos).onclick = function () {
+                        hand(this);
+                    };
                     //console.log(board[k].id);
                     document.getElementById("hand" + pos).name = board[k].id;
                 }
@@ -152,7 +165,9 @@
                     if (board[k].player == player && up1 < 3) {
                         up1++;
                         document.getElementById("bottom" + up1).src = "images/blue_back.png";
-                        document.getElementById("bottom" + up1).onclick = function(){hand(this);};
+                        document.getElementById("bottom" + up1).onclick = function () {
+                            hand(this);
+                        };
                         document.getElementById("bottom" + up1).name = board[k].id;
 
                     }
@@ -203,7 +218,7 @@
                     } else if (status === "success") {
                         // New data received, do what you want
                         var board = JSON.parse(data);
-                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
+                        print_data(board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
                     }
                 },
                 error: function (error) {
@@ -230,10 +245,10 @@
                     } else if (status === "success") {
                         // New data received, do what you want
                         var board = JSON.parse(data);
-                        if(board.erreur !== undefined)
-                        M.toast({html: board.erreur});
-                        if(board.erreur === undefined)
-                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
+                        if (board.erreur !== undefined)
+                            M.toast({html: board.erreur});
+                        if (board.erreur === undefined)
+                            print_data(board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
                     }
                 },
                 error: function (error) {
@@ -245,11 +260,29 @@
                 }
             });
         }
+
+        $(document).ready(function () {
+            $('.modal').modal();
+            $('#modal').modal('close');
+        });
+
+
     </script>
 {% endblock %}
 
 {% block main %}
-    <main class="container">
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h4>Fin de partie</h4>
+            <p>Un utilisateur a clôturé la partie</p>
+        </div>
+        <div class="modal-footer">
+            <a href="{{ path('homepage') }}" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+        </div>
+    </div>
+
+    <main onload="start()" class="container">
         <div class="row">
             <div class="col s2 offset-s3">
                 <img id="top1" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
@@ -264,7 +297,7 @@
                      style="max-width:75%;transform: translate(-50%);"/>
             </div>
             <div class="col s1 offset-s2">
-                <a class="waves-effect waves-light btn" onclick=kill()>Kill</a>
+                <a class="waves-effect waves-light btn" href="{{ path('homepage') }}" onclick=kill()>Kill</a>
             </div>
         </div>
         <div class="row">
@@ -410,7 +443,7 @@
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand22"  src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand22" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">

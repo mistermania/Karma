@@ -1,7 +1,43 @@
 {% extends 'base.html.twig' %}
 
 {% block javascripts %}
-    <script>
+    <script>        function start() {
+            setInterval(load, 3000);
+            load();
+        }
+        function load() {
+            var req = $.ajax({
+                url: "/lobby/checkstategame",
+                type: "POST",
+                dataType: "json",
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        //console.log(JSON.parse(data));
+                        var nbpl = JSON.parse(data);
+
+                        if(nbpl.start !== undefined) {
+                            console.log(nbpl);
+                            document.location.href = "{{ path('game') }}";
+                        }
+                        if(nbpl.nb_players !== undefined) {
+                            console.log(nbpl);
+                            document.getElementById('start').style.display = "";
+                            console.log(nbpl.nb_players);
+                            document.getElementById('number_player').innerHTML = nbpl.nb_players ;
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
+        }
         function startG() {
             var req = $.ajax({
                 url: "/lobby/start",
@@ -53,16 +89,18 @@
 {% block main %}
     <main class="container">
         <div class="row">
-            <div class="col s2 offset-s3">
+            <div class="col s2 offset-s3" id="search">
                 <a class="waves-effect waves-light btn" style="width:100%" onclick=research()>Research Party</a>
             </div>
+
+
             <div class="col s1">
-                <p style='text-align:center'>Nb Joueur</p>
+                <p style='text-align:center'>Nombres de joueurs</p>
             </div>
             <div class="col s1">
-                <p id="nbplayer" style='text-align:center'>0</p>
+                <p style='text-align:center' id="number_player">0</p>
             </div>
-            <div class="col s2">
+            <div style="display: none;"class="col s2"id="start">
                 <a class="waves-effect waves-light btn" style="width:100%" onclick=startG()>Start Party</a>
             </div>
         </div>

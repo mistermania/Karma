@@ -39,6 +39,30 @@ class User extends FosUser
     private $want_play = false;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="id_in_game", type="integer", nullable = true)
+     */
+     protected $id_in_game = null;
+
+    /**
+     * @return int
+     */
+    public function getIdInGame()
+    {
+        return $this->id_in_game;
+    }
+
+    /**
+     * @param int $id_in_game
+     */
+    public function setIdInGame($id_in_game)
+    {
+        $this->id_in_game = $id_in_game;
+    }
+
+
+    /**
      * @return bool
      */
     public function isWantPlay()

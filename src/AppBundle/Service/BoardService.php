@@ -56,6 +56,8 @@ class BoardService
 
     function initialiseBoard($board, $nb_players)
     {
+        $board[0]->setPlayer(100);
+        $board[0]->setState("bin");
         for ($i = 1; $i <= $nb_players; $i++) {
             for ($j = 0; $j < 9; $j++) {
                 $rand = rand(0, 51);
@@ -191,7 +193,7 @@ class BoardService
         foreach ($board as $card) {
             if ($card->getState() == "current_card" || $card->getState() == "played_card") {
                 $card->setPlayer(0);
-                $card->setState("hand");
+                $card->setState("bin");
             }
         }
     }

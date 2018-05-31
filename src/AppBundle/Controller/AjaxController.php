@@ -60,7 +60,7 @@ class AjaxController extends Controller
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        $json_clean_data = $serializer->serialize($json_array, 'json');
         dump($json_clean_data);
         if ($request->isXmlHttpRequest()) {
 
@@ -107,14 +107,15 @@ class AjaxController extends Controller
 
         $header = array('nb_player' => $nb_player,
             'current_player' => $current_player,
-            'id_player' => $user->getId());
+            'id_player' => $user->getId(),
+            'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
 
 
         $clean_data = $boardService->cleanSendBoard($board, $user->getId());
 
         $json_array = array('header' => $header,'board' => $clean_data);
         dump($json_array);
-        $json_clean_data = $serializer->serialize($clean_data, 'json');
+        $json_clean_data = $serializer->serialize($json_array, 'json');
 
 
         if ($request->isXmlHttpRequest()) {
@@ -154,6 +155,9 @@ class AjaxController extends Controller
 
                 if ($boardService->moveCard($board, $board[$id_card])) {
 
+                    if($board[$id_card]->getNumber() == 10){
+                        $boardService->putInBin($board);
+                    }
 
                     if($boardService->getPlayerCard($board,$user->getId(),"hand")<3){
                         $boardService->takePickaxe($board,$user->getId());
@@ -173,14 +177,15 @@ class AjaxController extends Controller
 
                     $header = array('nb_player' => $nb_player,
                         'current_player' => $current_player,
-                        'id_player' => $user->getId());
+                        'id_player' => $user->getId(),
+                        'nb_hand_card' => $boardService->getPlayerCard($board,$user->getId(),"hand"));
 
 
                     $clean_data = $boardService->cleanSendBoard($board, $user->getId());
 
                     $json_array = array('header' => $header,'board' => $clean_data);
                     dump($json_array);
-                    $json_clean_data = $serializer->serialize($clean_data, 'json');
+                    $json_clean_data = $serializer->serialize($json_array, 'json');
 
 
                     if ($request->isXmlHttpRequest()) {
@@ -192,6 +197,7 @@ class AjaxController extends Controller
                     $json_erreur = array('erreur' => "Le deplacement n'est pas possible ");
 
                     $json_clean_data = json_encode($json_erreur);
+                    return new JsonResponse($json_clean_data);
                 }
 
 
@@ -199,11 +205,13 @@ class AjaxController extends Controller
                 $json_erreur = array('erreur' => "La carte n'appartient pas au joueur");
 
                 $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
             }
         }else{
             $json_erreur = array('erreur' => "URL incorrect");
 
             $json_clean_data = json_encode($json_erreur);
+            return new JsonResponse($json_clean_data);
         }
 
 

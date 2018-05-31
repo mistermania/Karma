@@ -159,7 +159,7 @@ class BoardService
                 return true;
             } elseif ($card->getState() == "rest_up" && $this->getPlayerCard($board, $card->getPlayer(), "hand") == 0) {
                 return true;
-            } elseif ($card->getState() == "rest_down" && $this->getPlayerCard($board, $card->getPlayer(), "hand" && $this->getPlayerCard($board, $card->getPlayer(), "rest_up"))) {
+            } elseif ($card->getState() == "rest_down" && $this->getPlayerCard($board, $card->getPlayer(), "hand") == 0 && $this->getPlayerCard($board, $card->getPlayer(), "rest_up") == 0) {
                 return true;
             }
         }

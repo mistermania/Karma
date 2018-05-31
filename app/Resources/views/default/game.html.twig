@@ -2,8 +2,28 @@
 
 {% block javascripts %}
     <script>
-        function al(){
-            alert("!");
+        function kill(){
+            var req = $.ajax({
+                url: "/loby/kill",
+                type: "POST",
+                dataType: "json",
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        //console.log(JSON.parse(data));
+                        var nbpl = JSON.parse(data);
+                        console.log(nbpl);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
         }
         function load() {
             //alert("Loading...");
@@ -234,6 +254,9 @@
             <div class="col s2">
                 <img id="top3" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:75%;transform: translate(-50%);"/>
+            </div>
+            <div class="col s1 offset-s2">
+                <button id="kill" onclick=kill()>Kill</button>
             </div>
         </div>
         <div class="row">

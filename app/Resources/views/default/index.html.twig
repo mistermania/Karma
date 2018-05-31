@@ -1,7 +1,101 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+    <script>
+        function start() {
+            var req = $.ajax({
+                url: "/loby/start",
+                type: "POST",
+                dataType: "json",
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        //console.log(JSON.parse(data));
+                        var nbpl = JSON.parse(data);
+                        console.log(nbpl);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
+        }
+        function research() {
+            var req = $.ajax({
+                url: "/loby/search",
+                type: "POST",
+                dataType: "json",
+                ifModified: true,
+                success: function (data, status) {
+                    if (data === undefined && status == "notmodified") {
+                        // Old data received, ignore or similar
+
+                    } else if (status === "success") {
+                        // New data received, do what you want
+                        //console.log(JSON.parse(data));
+                        var nbpl = JSON.parse(data);
+                        console.log(nbpl);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:");
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+{% endblock %}
 {% block main %}
-    <main>
+    <main class="container">
+        <div class="row">
+            <div class="col s2 offset-s3">
+                <button style="width:100%" onclick=research()>Research Party</button>
+            </div>
+            <div class="col s1">
+                <p style='text-align:center'>Nb Joueur</p>
+            </div>
+            <div class="col s1">
+                <p id="nbplayer" style='text-align:center'>0</p>
+            </div>
+            <div class="col s2">
+                <button style="width:100%" onclick=start()>Start Party</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s10 offset-s1">
+                <p style='text-align:center'>Le KARMA est un jeu de société utilisant un jeu ordinaire de 52 cartes,
+                    très convivial et simple à apprendre. Deux joueurs au minimum sont requis. Néanmoins, de façon à
+                    laisser davantage place au côté stratégique du jeu, quatre joueurs sont conseillés.</p>
+                <p style='text-align:center'>Les cartes sont distribuées une à une. Les cartes en trop constitueront la
+                    pioche. On commence par donner à chacun une carte qui reste cachée, face contre la table. Cette
+                    étape est répétée de façon que chaque joueur dispose de 3 cartes devant lui, dont on ignore la
+                    valeur et la couleur. Ensuite, chaque joueur reçoit 3 cartes supplémentaires, toujours distribuées
+                    une à une, mais cette fois-ci, la couleur et la valeur de chaque carte sont montrées à tous. Ces 3
+                    cartes sont placées sur les 3 premières cartes distribuées. Enfin, on termine en donnant à tous les
+                    participants 3 autres cartes qui seront tenues en main et donc cachées des adversaires. Le reste des
+                    cartes constitue la pioche. Chaque joueur dispose ainsi de 9 cartes : 3 de faces cachées, 3 de faces
+                    visibles et 3 cartes en main.</p>
+                <p style='text-align:center'>Le joueur doit jouer au moins une carte de valeur supérieure ou égale à
+                    celle(s) posée(s) par le joueur précédent. Aussi longtemps qu'il reste des cartes dans la pioche, un
+                    joueur doit toujours posséder 3 cartes en main. Toutefois, il arrivera rapidement un moment où l'un
+                    des joueurs n'aura plus la possibilité de poser de cartes suffisamment grosses. Dans ce cas,
+                    celui-ci ramasse le paquet constitué et dispose désormais de toutes celles-ci pour jouer. La pioche
+                    épuisée, chaque joueur doit vider sa main afin de pouvoir jouer les 3 cartes visibles devant lui.
+                    Lorsqu'un joueur n'a de nouveau plus de cartes en main, il pioche au hasard une des trois cartes
+                    retournées disposées devant lui.</p>
+                <p style='text-align:center'>Le gagnant est le premier joueur à ne plus avoir de cartes devant lui ni
+                    dans sa main. </br>Cartes Spéciales:</br>2 : On peut déposer cette carte sur n'importe quelle autre
+                    sauf 9, le jeu repart au 2.<br/>9 : Le joueur suivant doit impérativement jouer une carte de valeur
+                    inférieure ou égale à 9.<br/>10 : On peut déposer cette carte sur n'importe quelle autre. Le joueur
+                    qui a joué 10 rejoue.<br/>Les cartes du tas sont retirées du jeu et ne pourront pas revenir dans la
+                    partie.<br/><br/>Ordre croissant des cartes: 2,3,4,...,Valet,Dame,Roi,As</p>
+            </div>
+        </div>
 
 
     </main>

@@ -66,7 +66,7 @@ class PlayController extends Controller
                 );
                 dump($test);
                 if (count($test)<4 && count($test)>0){
-                    if(($test[0])->isWantPlay() == true){
+                    if($test[0]->isWantPlay() == true && $test[0]->getInGame()->getState() != 2){
                         $user->setInGame($game);
                         $indice = 0;
                     }
@@ -90,24 +90,6 @@ class PlayController extends Controller
         ]);
     }
 
-    /**
-     * @Route("end")
-     */
-    public function endAction(){
-        $em = $this->getDoctrine()->getManager();
-        $userid = $this->getUser()->getId();
-        $user = $em->getRepository('AppBundle:User')->find($userid);
-
-        $user->setWantPlay(false);
-        $user->setInGame(null);
-
-        $em->flush();
-        return $this->render('play/create.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
-        ]);
-
-
-    }
 
     /**
      * @Route("/lobby")

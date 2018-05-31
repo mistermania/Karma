@@ -56,6 +56,8 @@ class BoardService
 
     function initialiseBoard($board, $nb_players)
     {
+        $board[0]->setPlayer(100);
+        $board[0]->setState("bin");
         for ($i = 1; $i <= $nb_players; $i++) {
             for ($j = 0; $j < 9; $j++) {
                 $rand = rand(0, 51);
@@ -133,8 +135,6 @@ class BoardService
         return $nb_card;
     }
 
-
-
     function checkMove($board, $card_move)
     {
         $number = $card_move->getNumber();
@@ -177,37 +177,6 @@ class BoardService
         return false;
     }
 
-    function checkMoveCardTot($board, $card)
-    {
-        if ($this->checkMoveCard($board, $card)) {
-            if ($this->checkMove($board, $card)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function moveMultipleCard($board,$card_move){
-        foreach ($board as $card) {
-            if ($card->getNumber() == $card_move->getNumber()) {
-                if(!$this->moveCard($board,$card)){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    function numberSameCard($board,$card_model){
-        $number = 0;
-        foreach ($board as $card) {
-            if ($card->getNumber() == $card_model->getNumber() && $card->getPlayer() == $card_model->getPlayer()) {
-                $number++;
-            }
-        }
-        return $number;
-    }
-
     function changeCurrentCard($board, $id_card)
     {
         foreach ($board as $card) {
@@ -224,7 +193,7 @@ class BoardService
         foreach ($board as $card) {
             if ($card->getState() == "current_card" || $card->getState() == "played_card") {
                 $card->setPlayer(0);
-                $card->setState("hand");
+                $card->setState("bin");
             }
         }
     }

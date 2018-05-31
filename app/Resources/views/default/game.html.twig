@@ -31,8 +31,8 @@
                         // New data received, do what you want
                         //console.log(JSON.parse(data));
                         var board = JSON.parse(data);
-                        //console.log(board.board);
-                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
+                        console.log(board);
+                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
                     }
                 },
                 error: function (error) {
@@ -42,16 +42,21 @@
             });
         }
 
-        function print_data(board, player, nbplayer, nbhand) {
+        function print_data(board, player, nbplayer, nbhand, nbcurrentplayer) {
             var up1 = 0, up2 = 0, up3 = 0, up4 = 0;
             var pos = 6 - parseInt(nbhand / 2);
             if(nbhand > 12)
                 pos = 0;
 
+            document.getElementById("text1").innerText = "Tour Player "+nbcurrentplayer;
+            document.getElementById("text2").innerText = "You are Player "+player;
 
             document.getElementById("take").src = "images/empty_back.png";
-            for(var i=1;i<25;i++)
+            for(var i=1;i<25;i++){
                 document.getElementById("hand"+i).src = "images/empty_back.png";
+                document.getElementById("hand"+i).name = -1;
+
+            }
             for(var i=1;i<=3;i++){
                 document.getElementById("left"+i).src = "images/empty_back.png";
                 document.getElementById("right"+i).src = "images/empty_back.png";
@@ -101,11 +106,17 @@
                         }
                     }
                 }
+
+
+                //            HAND
+
+
                 else if (board[k].state == "hand" && board[k].player == player && nbhand > 0) {
                     pos++;
-                    console.log(pos);
+                    //console.log(pos);
                     document.getElementById("hand" + pos).src = "images/" + board[k].image;
                     document.getElementById("hand" + pos).onclick = function(){hand(this);};
+                    //console.log(board[k].id);
                     document.getElementById("hand" + pos).name = board[k].id;
                 }
             }
@@ -151,6 +162,7 @@
         }
 
         function take() {
+            //alert("Take");
             var req = $.ajax({
                 url: "/ajax/take_played_card",
                 type: "POST",
@@ -163,7 +175,7 @@
                     } else if (status === "success") {
                         // New data received, do what you want
                         var board = JSON.parse(data);
-                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
+                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
                     }
                 },
                 error: function (error) {
@@ -175,7 +187,7 @@
 
         function hand(el) {
             //alert("Hand"+el.name);
-            //console.log(el.name);
+            //console.log(el.name.toString());
             //data: {"id_card": id},
             var req = $.ajax({
                 url: "/ajax/move_card",
@@ -190,85 +202,25 @@
                     } else if (status === "success") {
                         // New data received, do what you want
                         var board = JSON.parse(data);
-                        console.log(board);
-                        if(board.multiple !== undefined) {
-                            console.log(board.multiple);
-                            setMutipleCardModal(board.multiple);
-                        }
-                        else{
-                            print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
-                        }
+                        if(board.erreur !== undefined)
+                        M.toast({html: board.erreur});
+                        if(board.erreur === undefined)
+                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card, board.header.current_player);
                     }
                 },
                 error: function (error) {
+                    //var err = error;
+                    console.log(error);
+                    //M.toast({html: err.erreur.toString()});
                     console.log("Error:");
                     console.log(error);
                 }
             });
         }
-
-
-
-        $(document).ready(function(){
-         //   setMutipleCardModal(3);
-        });
-
-        function setMutipleCardModal(id_card){
-            $('#modal1').modal({
-                dismissible: false
-            });
-            $('#modal1').modal('open');
-            document.getElementById("id_mutiple_card").innerHTML = id_card;
-
-        };
-        function multipleCard(choice) {
-            var id_card = document.getElementById("id_mutiple_card").value;
-            var req = $.ajax({
-                url: "/ajax/move_multiple_card",
-                type: "POST",
-                dataType: "json",
-                data: "{'id_card':"+id_card+"}",
-                ifModified: true,
-                success: function (data, status) {
-                    console.log(data);
-                    if (data === undefined && status == "notmodified") {
-                        // Old data received, ignore or similar
-
-                    } else if (status === "success") {
-                        // New data received, do what you want
-                        var board = JSON.parse(data);
-                        print_data( board.board, board.header.id_player, board.header.nb_player, board.header.nb_hand_card);
-                    }
-                },
-                error: function (error) {
-                    console.log("Error:");
-                    console.log(error);
-                }
-            });
-        }
-
     </script>
 {% endblock %}
 
 {% block main %}
-
-
-    <!-- Modal Structure -->
-    <div id="modal1" class="modal">
-        <div class="modal-content">
-            <h4>Multiple cards</h4>
-            <p>How many cards do you want played ?</p>
-        </div>
-        <div class="modal-footer">
-            <div id="id_mutiple_card" hidden></div>
-            <a onclick="multipleCard('one')" class="modal-close waves-effect waves-green btn-flat">Play ONE</a>
-            <a onclick="multipleCard('all')" class="modal-close waves-effect waves-green btn-flat">Play ALL</a>
-        </div>
-    </div>
-
-
-
-
     <main class="container">
         <div class="row">
             <div class="col s2 offset-s3">
@@ -289,11 +241,17 @@
                 <img id="left3" src="{{ asset('images/blue_back.png') }}"
                      style="transform: rotate(90deg)translate(-100%,-75%);height:auto;max-width:75%;"/>
             </div>
-            <div class="col s2 offset-s3">
+            <div class="col s1 offset-s2">
+                <p id="text1">Text</p>
+            </div>
+            <div class="col s2">
                 <img id="take" onclick="take()" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:75%;"/>
             </div>
-            <div class="col s2 offset-s3">
+            <div class="col s1">
+                <p id="text2">Text</p>
+            </div>
+            <div class="col s2 offset-s2">
                 <img id="right3" src="{{ asset('images/blue_back.png') }}"
                      style="transform: rotate(90deg)translate(-100%,75%);height:auto;max-width:75%;"/>
             </div>
@@ -339,103 +297,100 @@
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand2" onclick="hand(2)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand2" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand3" onclick="hand(3)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand3" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand4" onclick="hand(4)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand4" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand5" onclick="hand(5)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand5" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand6" onclick="hand(6)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand6" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand7" onclick="hand(7)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand7" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand8" onclick="hand(8)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand8" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand9" onclick="hand(9)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand9" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand10" onclick="hand(10)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand10" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand11" onclick="hand(11)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand11" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand12" onclick="hand(12)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand12" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
         </div>
         <div class="row">
             <div class="col s1">
-                <img id="hand13" onclick="hand(13)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand13" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand14" onclick="hand(14)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand14" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand15" onclick="hand(15)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand15" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand16" onclick="hand(16)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand16" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand17" onclick="hand(17)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand17" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand18" onclick="hand(18)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand18" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand19" onclick="hand(19)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand19" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand20" onclick="hand(20)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand20" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand21" onclick="hand(21)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand21" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand22" onclick="hand(22)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand22"  src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand23" onclick="hand(23)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand23" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
             <div class="col s1">
-                <img id="hand24" onclick="hand(24)" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
+                <img id="hand24" src="{{ asset('images/blue_back.png') }}" class="responsive-img"
                      style="max-width:125%;transform:translate(0,-325%);"/>
             </div>
         </div>
 
     </main>
-
-
-
 {% endblock %}

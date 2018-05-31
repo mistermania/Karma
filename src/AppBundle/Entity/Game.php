@@ -59,6 +59,32 @@ class Game
     private $tourJoueur;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="nb_joueurs", type="integer", nullable = true)
+     */
+    private $nb_joueurs;
+
+    /**
+     * @return int
+     */
+    public function getNbJoueurs()
+    {
+        return $this->nb_joueurs;
+    }
+
+    /**
+     * @param int $nb_joueurs
+     *
+     * @return Game
+     */
+    public function setNbJoueurs($nb_joueurs)
+    {
+        $this->nb_joueurs = $nb_joueurs;
+    }
+
+
+    /**
      * Get tourJoueur
      *
      * @return int
@@ -171,4 +197,3 @@ class Game
         return $this->state;
     }
 }
-

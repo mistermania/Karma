@@ -23,6 +23,14 @@ class Game
     private $id;
 
     /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="date_in", type="date", nullable=true)
@@ -37,17 +45,72 @@ class Game
     private $board;
 
     /**
-     * @var bool
+     * @var int
      *
-     * @ORM\Column(name="state", type="boolean")
+     * @ORM\Column(name="state", type="integer", nullable = true)
      */
-    private $state;
+    private $state = true;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="tour", type="integer", nullable = true)
+     */
+    private $tourJoueur;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="nb_joueurs", type="integer", nullable = true)
+     */
+    private $nb_joueurs;
+
+    /**
+     * @return int
+     */
+    public function getNbJoueurs()
+    {
+        return $this->nb_joueurs;
+    }
+
+    /**
+     * @param int $nb_joueurs
+     *
+     * @return Game
+     */
+    public function setNbJoueurs($nb_joueurs)
+    {
+        $this->nb_joueurs = $nb_joueurs;
+    }
+
+
+    /**
+     * Get tourJoueur
+     *
+     * @return int
+     */
+    public function getTourJoueur()
+    {
+        return $this->tourJoueur;
+    }
+
+    /**
+     * Set state
+     *
+     * @param int $tourJoueur
+     *
+     * @return Game
+     */
+    public function setTourJoueur($tourJoueur)
+    {
+        $this->tourJoueur = $tourJoueur;
+    }
 
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="games")
-     * @ORM\JoinColumn(name="players_id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="in_game")
+     *
      */
     private $players;
 
@@ -113,7 +176,7 @@ class Game
     /**
      * Set state
      *
-     * @param boolean $state
+     * @param int $state
      *
      * @return Game
      */
@@ -127,11 +190,10 @@ class Game
     /**
      * Get state
      *
-     * @return bool
+     * @return int
      */
     public function getState()
     {
         return $this->state;
     }
 }
-

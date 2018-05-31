@@ -26,10 +26,73 @@ class User extends FosUser
     /**
      * @var Collection
      *
-     * @ORM\OneToMany(targetEntity="Game", mappedBy="players")
+     * @ORM\ManyToOne(targetEntity="Game", inversedBy="players")
+     * @ORM\JoinColumn(name="in_game", referencedColumnName="id")
      */
-    protected $games;
+    protected $in_game = null;
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="want_play", type="boolean", )
+     */
+    private $want_play = false;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id_in_game", type="integer", nullable = true)
+     */
+     protected $id_in_game = null;
+
+    /**
+     * @return int
+     */
+    public function getIdInGame()
+    {
+        return $this->id_in_game;
+    }
+
+    /**
+     * @param int $id_in_game
+     */
+    public function setIdInGame($id_in_game)
+    {
+        $this->id_in_game = $id_in_game;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isWantPlay()
+    {
+        return $this->want_play;
+    }
+
+    /**
+     * @param bool $want_play
+     */
+    public function setWantPlay($want_play)
+    {
+        $this->want_play = $want_play;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getInGame()
+    {
+        return $this->in_game;
+    }
+
+    /**
+     * @param Collection $in_game
+     */
+    public function setInGame($in_game)
+    {
+        $this->in_game = $in_game;
+    }
 
     /**
      * Get id

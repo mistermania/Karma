@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <main>
+
+        {% for name in nameList %}
+           <p>{{ name }}</p>
+        {% endfor %}
+    </main>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 {% block javascripts %}
     <script>
-        function start() {
+        function startG() {
             var req = $.ajax({
                 url: "/loby/start",
                 type: "POST",
@@ -54,7 +54,7 @@
     <main class="container">
         <div class="row">
             <div class="col s2 offset-s3">
-                <button style="width:100%" onclick=research()>Research Party</button>
+                <a class="waves-effect waves-light btn" style="width:100%" onclick=research()>Research Party</a>
             </div>
             <div class="col s1">
                 <p style='text-align:center'>Nb Joueur</p>
@@ -63,7 +63,7 @@
                 <p id="nbplayer" style='text-align:center'>0</p>
             </div>
             <div class="col s2">
-                <button style="width:100%" onclick=start()>Start Party</button>
+                <a class="waves-effect waves-light btn" style="width:100%" onclick=startG()>Start Party</a>
             </div>
         </div>
         <div class="row">

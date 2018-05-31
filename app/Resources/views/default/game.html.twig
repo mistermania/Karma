@@ -82,6 +82,7 @@
                 document.getElementById("right"+i).src = "images/empty_back.png";
                 document.getElementById("top"+i).src = "images/empty_back.png";
                 document.getElementById("bottom"+i).src = "images/empty_back.png";
+                document.getElementById("bottom"+i).name = -1;
             }
 
             for (var k in board) {
@@ -146,6 +147,8 @@
                     if (board[k].player == player && up1 < 3) {
                         up1++;
                         document.getElementById("bottom" + up1).src = "images/blue_back.png";
+                        document.getElementById("bottom" + up1).onclick = function(){hand(this);};
+                        document.getElementById("bottom" + up1).name = board[k].id;
 
                     }
                     else if (nbplayer == 2 && board[k].player == (player) % 2 + 1 && up3 < 3) {
@@ -256,7 +259,7 @@
                      style="max-width:75%;transform: translate(-50%);"/>
             </div>
             <div class="col s1 offset-s2">
-                <button id="kill" onclick=kill()>Kill</button>
+                <a class="waves-effect waves-light btn" onclick=kill()>Kill</a>
             </div>
         </div>
         <div class="row">

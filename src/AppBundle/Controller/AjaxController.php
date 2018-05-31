@@ -46,24 +46,16 @@ class AjaxController extends Controller
         $normalizers = [new ObjectNormalizer(), new ArrayDenormalizer()];
         $serializer = new Serializer($normalizers, $encoders);
 
-        $em = $this->getDoctrine()->getManager();
+        $current_player = $user->getInGame()->getTourJoueur();
 
-        $userInGame = $em->getRepository('AppBundle:User')->findBy(
-            array('in_game' => $user->getInGame())
-        );
 
-        $nb_player = count($userInGame);
-        $usertemp = $user->getInGame()->getTourJoueur() +1;
-        if($usertemp == 5) $usertemp = 1;
-        $current_player = $usertemp;
-
-        $header = array('nb_player' => $nb_player,
+        $header = array('nb_player' => $user->getInGame()->getNbJoueurs(),
             'current_player' => $current_player,
-            'id_player' => $user->getId(),
-            'nb_hand_card' => $boardService->getPlayerCard($board, $user->getId(), "hand"));
+            'id_player' => $user->getIdInGame(),
+            'nb_hand_card' => $boardService->getPlayerCard($board, $user->getIdInGame(), "hand"));
 
 
-        $clean_data = $boardService->cleanSendBoard($board, $user->getId());
+        $clean_data = $boardService->cleanSendBoard($board, $user->getIdInGame());
 
         $json_array = array('header' => $header, 'board' => $clean_data);
         dump($json_array);
@@ -98,8 +90,8 @@ class AjaxController extends Controller
 
         $user = $this->getUser();
 
-        $boardService->takePlayedCard($board, $user->getId());
-
+        $boardService->takePlayedCard($board, $user->getIdInGame());
+        $this->passeTourBDD($user->getInGame()->getNbJoueurs());
 
         $this->addBoardBDD($board);
 
@@ -109,24 +101,17 @@ class AjaxController extends Controller
         $serializer = new Serializer($normalizers, $encoders);
 
 
-        $em = $this->getDoctrine()->getManager();
 
-        $userInGame = $em->getRepository('AppBundle:User')->findBy(
-            array('in_game' => $user->getInGame())
-        );
 
-        $nb_player = count($userInGame);
-        $usertemp = $user->getInGame()->getTourJoueur() +1;
-        if($usertemp == 5) $usertemp = 1;
-        $current_player = $usertemp;
 
-        $header = array('nb_player' => $nb_player,
+        $current_player = $user->getInGame()->getTourJoueur();
+        $header = array('nb_player' => $user->getInGame()->getNbJoueurs(),
             'current_player' => $current_player,
-            'id_player' => $user->getId(),
-            'nb_hand_card' => $boardService->getPlayerCard($board, $user->getId(), "hand"));
+            'id_player' => $user->getIdInGame(),
+            'nb_hand_card' => $boardService->getPlayerCard($board, $user->getIdInGame(), "hand"));
 
 
-        $clean_data = $boardService->cleanSendBoard($board, $user->getId());
+        $clean_data = $boardService->cleanSendBoard($board, $user->getIdInGame());
 
         $json_array = array('header' => $header, 'board' => $clean_data);
         dump($json_array);
@@ -154,7 +139,7 @@ class AjaxController extends Controller
 
         $board = $this->getBoardBDD();
 
-        dump($board);
+        //dump($board);
 
         $boardService = new BoardService();
 
@@ -162,25 +147,30 @@ class AjaxController extends Controller
 
         if ($request->request->get('id_card')) {
 
-            $userTest = $user->getInGame()->getTourJoueur() + 1;
-            if ($userTest == 5) $userTest = 1;
-
-            if ($user->getId() == $userTest) {
+            $userTest = ($user->getInGame()->getTourJoueur() % $user->getInGame()->getNbJoueurs() )+ 1 ;
+            dump($user->getIdInGame());
+            dump($userTest);
+            $current_player = ($user->getInGame()->getTourJoueur() % $user->getInGame()->getNbJoueurs() )+ 1;
+            if ($user->getIdInGame() == $user->getInGame()->getTourJoueur()) {
 
                 $id_card = $request->request->get("id_card");
 
 
-                if ($board[$id_card]->getPlayer() == $user->getId()) {
+                if ($board[$id_card]->getPlayer() == $user->getIdInGame()) {
 
 
                     if ($boardService->moveCard($board, $board[$id_card])) {
 
                         if ($board[$id_card]->getNumber() == 10) {
                             $boardService->putInBin($board);
+                        }else{
+                            $this->passeTourBDD($user->getInGame()->getNbJoueurs());
+
                         }
 
-                        if ($boardService->getPlayerCard($board, $user->getId(), "hand") < 3) {
-                            $boardService->takePickaxe($board, $user->getId());
+                        if ($boardService->getPlayerCard($board, $user->getIdInGame(), "hand") < 3) {
+                            $boardService->takePickaxe($board, $user->getIdInGame());
+
                         }
 
 
@@ -192,26 +182,16 @@ class AjaxController extends Controller
                         $serializer = new Serializer($normalizers, $encoders);
 
 
-                        $em = $this->getDoctrine()->getManager();
-
-                        $userInGame = $em->getRepository('AppBundle:User')->findBy(
-                            array('in_game' => $user->getInGame())
-                        );
-
-                        $nb_player = count($userInGame);
-                        $usertemp = $user->getInGame()->getTourJoueur() +1;
-                        if($usertemp == 5) $usertemp = 1;
-                        $current_player = $usertemp;
-                        $this->passeTourBDD($nb_player);
 
 
-                        $header = array('nb_player' => $nb_player,
+
+                        $header = array('nb_player' => $user->getInGame()->getNbJoueurs(),
                             'current_player' => $current_player,
-                            'id_player' => $user->getId(),
-                            'nb_hand_card' => $boardService->getPlayerCard($board, $user->getId(), "hand"));
+                            'id_player' => $user->getIdInGame(),
+                            'nb_hand_card' => $boardService->getPlayerCard($board, $user->getIdInGame(), "hand"));
 
 
-                        $clean_data = $boardService->cleanSendBoard($board, $user->getId());
+                        $clean_data = $boardService->cleanSendBoard($board, $user->getIdInGame());
 
                         $json_array = array('header' => $header, 'board' => $clean_data);
                         dump($json_array);
@@ -314,15 +294,5 @@ class AjaxController extends Controller
         $em->flush();
     }
 
-    private function endGameOfUser(){
-        $em = $this->getDoctrine()->getManager();
-        $userid = $this->getUser()->getId();
-        $user = $em->getRepository('AppBundle:User')->find($userid);
 
-        $user->setWantPlay(false);
-        $user->setInGame(null);
-
-        $em->flush();
-
-    }
 }

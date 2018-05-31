@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\AppBundle;
 use AppBundle\Entity\User;
+use AppBundle\Model\CarteModel;
 use AppBundle\Service\BoardService;
 use Proxies\__CG__\AppBundle\Entity\Game;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -11,6 +12,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -98,6 +101,21 @@ class PlayController extends Controller
             $game = $em->getRepository("AppBundle:Game")->find($gameid);
             if ($game->getNbJoueurs() > 1) {
                 $game->setState(1);
+                $boardService = new BoardService();
+                $data = $game->getBoard();
+
+                $serializer = new Serializer(
+                    array(new GetSetMethodNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()),
+                    array(new XmlEncoder(), new JsonEncoder())
+                );
+
+                $board = $serializer->deserialize($data, CarteModel::class . '[]', 'json');
+
+                $gameboard = $boardService->initialiseBoard($board,$game->getNbJoueurs());
+
+                $data2 = $serializer->serialize($gameboard, 'json');
+                $game->setBoard($data2);
+                $game->setTourJoueur(1);
 
                 $em->persist($game);
                 $em->flush();

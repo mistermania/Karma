@@ -2,9 +2,14 @@
 
 {% block javascripts %}
     <script>
+        function start() {
+            setInterval(load, 1000);
+            load();
+        }
+
         function kill(){
             var req = $.ajax({
-                url: "/loby/kill",
+                url: "/lobby/kill",
                 type: "POST",
                 dataType: "json",
                 ifModified: true,

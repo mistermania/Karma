@@ -96,15 +96,27 @@ class BoardService
         return $board;
     }
 
+    function isPickaxe($board)
+    {
+        foreach ($board as $card) {
+            if ($card->getState() == "pickaxe") {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function takePickaxe($board, $player)
     {
-
-        $rand = rand(0, count($board) - 1);
-        while ($board[$rand]->getState() != "pickaxe") {
+        if ($this->isPickaxe($board)) {
             $rand = rand(0, count($board) - 1);
+
+            while ($board[$rand]->getState() != "pickaxe") {
+                $rand = rand(0, count($board) - 1);
+            }
+            $board[$rand]->setPlayer($player);
+            $board[$rand]->setState("hand");
         }
-        $board[$rand]->setPlayer($player);
-        $board[$rand]->setState("hand");
         return $board;
     }
 

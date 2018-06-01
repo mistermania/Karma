@@ -28,7 +28,13 @@ class AjaxController extends Controller
     public function indexAction(Request $request)
     {
         //recupère le tableau en bdd
+        $user = $this->getUser();
+        if($user->getInGame() == null){
+            $json_erreur = array('kill' => "Un des utilisateurs a cloturé la partie");
 
+            $json_clean_data = json_encode($json_erreur);
+            return new JsonResponse($json_clean_data);
+        }
 
         $board = $this->getBoardBDD();
 
@@ -37,7 +43,7 @@ class AjaxController extends Controller
         $boardService = new BoardService();
 
 
-        $user = $this->getUser();
+
         dump($user->getUserName());
         dump($user->getId());
 

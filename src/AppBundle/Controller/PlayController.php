@@ -10,6 +10,7 @@ use Proxies\__CG__\AppBundle\Entity\Game;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -164,9 +165,9 @@ class PlayController extends Controller
     }
 
     /**
-     * @Route("/kill", name="kill")
+     * @Route("/kill", name="route_kill")
      */
-    public function endAction()
+    public function killAction()
     {
         $em = $this->getDoctrine()->getManager();
         $userid = $this->getUser()->getId();
@@ -194,7 +195,56 @@ class PlayController extends Controller
 
         $em->flush();
 
-        return $this->render('default/index.html.twig');
+        return $this->redirectToRoute('homepage');
 
     }
+
+
+    /**
+     * @Route("/checkstategame", name="check_state_game")
+     */
+    public function checkStateGame()
+    {
+
+
+        $user = $this->getUser();
+
+        $em = $this->getDoctrine()->getManager();
+        $game = $user->getInGame();
+
+        $userList = $em->getRepository('AppBundle:User')->findBy(
+            array('in_game' => $game)
+        );
+        if($game != null) {
+            if ($user->getInGame()->getState()) {
+                $json_erreur = array('start' => 'start');
+
+                $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
+
+            }
+            if (count($userList) > 1) {
+                $json_erreur = array('nb_players' => count($userList));
+
+                $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
+
+            } else {
+                $json_erreur = array('nouser' => "No users");
+
+                $json_clean_data = json_encode($json_erreur);
+                return new JsonResponse($json_clean_data);
+            }
+        }else{
+            $json_erreur = array('erreur' => "No Game");
+
+            $json_clean_data = json_encode($json_erreur);
+            return new JsonResponse($json_clean_data);
+        }
+
+
+
+    }
+
+
 }

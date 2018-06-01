@@ -26,45 +26,6 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // replace this example code with whatever you need
-        /*
-        $board = new BoardService();
-
-        $board = $boardService->initialiseBoard($boardService->createBoard(),4);
-
-        $boardService->takePickaxe($board,1);
-        dump($boardService->getPlayerCard($board,1,"hand"));
-
-
-        dump($boardService->getPlayerCard($board,1,"all"));
-
-        dump($boardService->getPlayerCard($board,1,"hand"));
-
-        $boardService->takePickaxe($board,1);
-        dump($boardService->getPlayerCard($board,1,"hand"));
-
-        dump($boardService->getPlayerCard($board,1,"rest_down"));
-
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new ObjectNormalizer());
-
-        $serializer = new Serializer($normalizers,$encoders);
-
-        $data = $serializer->serialize($current_board,'xml');
-
-        $game = new Game();
-        $game->setBoard($data);
-        $dt = new \DateTime();
-        $dt->format('Y-m-d H:i:s');
-        $game->setDateIn($dt);
-        $game->setState(false);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $em->persist($game);
-        $em->flush();
-        */
-
 
 
 
